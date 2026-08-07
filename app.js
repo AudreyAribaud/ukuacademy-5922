@@ -1,470 +1,352 @@
-// Web Audio Context Initialization
+// Audio Context Initialization
 let audioCtx = null;
 
 function getAudioContext() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-    }
-    return audioCtx;
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
 }
 
-// App State
-const state = {
-    learnedChords: JSON.parse(localStorage.getItem('learnedChords')) || [],
-    currentPlayingOscillator: null,
-    metronomeInterval: null,
-    metronomeBpm: 120,
-    metronomePlaying: false,
-    metronomeBeatCount: 0,
-    scrollInterval: null,
-    scrollPlaying: false
+// Ukulele String Base Frequencies
+const STRINGS = {
+  G: 392.00,
+  C: 261.63,
+  E: 329.63,
+  A: 440.00
 };
 
-// Chord Database
-const CHORDS = [
-    { name: 'C', frets: [0, 0, 0, 3], notes: ['G4', 'C4', 'E4', 'C5'] },
-    { name: 'Am', frets: [2, 0, 0, 0], notes: ['A4', 'C4', 'E4', 'A4'] },
-    { name: 'F', frets: [2, 0, 1, 0], notes: ['A4', 'C4', 'F4', 'A4'] },
-    { name: 'G', frets: [0, 2, 3, 2], notes: ['G4', 'D4', 'G4', 'B4'] },
-    { name: 'C7', frets: [0, 0, 0, 1], notes: ['G4', 'C4', 'E4', 'Bb4'] },
-    { name: 'D', frets: [2, 2, 2, 0], notes: ['A4', 'D4', 'F#4', 'A4'] },
-    { name: 'Dm', frets: [2, 2, 1, 0], notes: ['A4', 'D4', 'F4', 'A4'] },
-    { name: 'Em', frets: [0, 4, 3, 2], notes: ['G4', 'E4', 'G4', 'B4'] },
-    { name: 'A', frets: [2, 1, 0, 0], notes: ['A4', 'C#4', 'E4', 'A4'] },
-    { name: 'G7', frets: [0, 2, 1, 2], notes: ['G4', 'D4', 'F4', 'B4'] }
-];
+// Chord Definitions (Frets: [G, C, E, A])
+const CHORDS = {
+  'C': [0, 0, 0, 3],
+  'G': [0, 2, 3, 2],
+  'Am': [2, 0, 0, 0],
+  'F': [2, 0, 1, 0],
+  'D': [2, 2, 2, 0],
+  'Em': [0, 4, 3, 2],
+  'A': [2, 1, 0, 0],
+  'Dm': [2, 2, 1, 0]
+};
 
 // Songs Database
 const SONGS = [
-    {
-        title: "Riptide",
-        artist: "Vance Joy",
-        difficulty: "Facile",
-        chords: ["Am", "G", "C"],
-        lyrics: "[Am] I was scared of [G] dentisits and the [C] dark\n[Am] I was scared of [G] pretty girls and [C] starting conversations\n[Am] Oh, all my [G] friends are turning [C] green\n[Am] You're the magician's [G] assistant in their [C] dreams\n\n[Am] Oh, [G] oh, and they [C] come unstuck\n[Am] Lady, [G] running down to the [C] riptide\nTaken away to the [Am] dark side\n[G] I wanna be your [C] left hand man"
-    },
-    {
-        title: "You Are My Sunshine",
-        artist: "Traditionnel",
-        difficulty: "Facile",
-        chords: ["C", "C7", "F", "G"],
-        lyrics: "The other [C] night dear, as I lay sleeping\nI dreamed I [C7] held you in my [F] arms\nBut when I [C] awoke, dear, I was mistaken\nSo I hung my [G] head and I [C] cried.\n\nYou are my [C] sunshine, my only sunshine\nYou make me [C7] happy when skies are [F] grey\nYou'll never [C] know, dear, how much I love you\nPlease don't take my [G] sunshine [C] away."
-    },
-    {
-        title: "La Vie en Rose",
-        artist: "Édith Piaf",
-        difficulty: "Moyen",
-        chords: ["C", "Am", "F", "G"],
-        lyrics: "[C] Des yeux qui font baisser les [Am] miens\nUn rire qui se [F] perd sur sa [G] bouche\nVoilà le [C] portrait sans re[Am]touche\nDe l'homme [F] auquel j'appar[G]tiens\n\nQuand il me [C] prend dans ses bras\nIl me parle tout [Am] bas\nJe vois la vie en [F] rose [G]\nIl me [C] dit des mots d'amour\nDes mots de tous les [Am] jours\nEt ça me fait quelque [F] chose [G]"
-    }
+  {
+    id: 1,
+    title: "Riptide",
+    artist: "Vance Joy",
+    chords: ["Am", "G", "C"],
+    lyrics: "[Am] I was scared of [G] dentists and the [C] dark\n[Am] I was scared of [G] pretty girls and [C] starting conversations\nOh, [Am] all my friends are [G] turning green\nYou're the [C] magician's assistant in their dream\n\nAh-ah-[Am]oh, [G] don't run [C] away"
+  },
+  {
+    id: 2,
+    title: "Over the Rainbow",
+    artist: "Israel Kamakawiwo'ole",
+    chords: ["C", "G", "Am", "F"],
+    lyrics: "[C] Somewhere [G] over the rainbow [F] way up [C] high\n[F] And the [C] dreams that you dream of [G] once in a lulla[Am]by [F]\n\n[C] Somewhere [G] over the rainbow [F] blue birds [C] fly\n[F] And the [C] dreams that you dream of [G] dreams really do [Am] come [F] true"
+  },
+  {
+    id: 3,
+    title: "La Vie en Rose",
+    artist: "Édith Piaf",
+    chords: ["C", "Am", "F", "G"],
+    lyrics: "Quand il me [C] prend dans ses bras\nIl me parle tout [Am] bas\nJe vois la vie en [F] rose [G]\n\nIl me [C] dit des mots d'amour\nDes mots de tous les [Am] jours\nEt ça me fait quelque [F] chose [G]"
+  }
 ];
 
-// Note Frequencies mapping for Tuner
-const NOTE_FREQS = {
-    'G4': 392.00,
-    'C4': 261.63,
-    'E4': 329.63,
-    'A4': 440.00
-};
+// Play a single note
+function playNote(frequency, duration = 0.8, delay = 0) {
+  const ctx = getAudioContext();
+  const osc = ctx.createOscillator();
+  const gainNode = ctx.createGain();
 
-// Navigation Router
-document.querySelectorAll('.nav-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
-        
-        btn.classList.add('active');
-        const target = btn.getAttribute('data-target');
-        document.getElementById(target).classList.add('active');
-        
-        // Stop any active audio when switching views
-        stopAllAudio();
-    });
-});
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(frequency, ctx.currentTime + delay);
 
-// --- TUNER LOGIC ---
-const pegButtons = document.querySelectorAll('.peg-btn');
-const stopTunerBtn = document.getElementById('stop-tuner-btn');
+  gainNode.gain.setValueAtTime(0.3, ctx.currentTime + delay);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
 
-pegButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const freq = parseFloat(btn.getAttribute('data-freq'));
-        playReferenceNote(freq, btn);
-    });
-});
+  osc.connect(gainNode);
+  gainNode.connect(ctx.destination);
 
-stopTunerBtn.addEventListener('click', stopAllAudio);
-
-function playReferenceNote(frequency, buttonElement) {
-    stopAllAudio();
-    const ctx = getAudioContext();
-    
-    const osc = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    
-    osc.type = 'sine';
-    osc.frequency.value = frequency;
-    
-    gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
-    // Soft fade out after 3 seconds
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3);
-    
-    osc.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    
-    osc.start();
-    osc.stop(ctx.currentTime + 3);
-    
-    state.currentPlayingOscillator = osc;
-    
-    buttonElement.classList.add('playing');
-    setTimeout(() => {
-        buttonElement.classList.remove('playing');
-    }, 3000);
+  osc.start(ctx.currentTime + delay);
+  osc.stop(ctx.currentTime + delay + duration);
 }
 
-function stopAllAudio() {
-    if (state.currentPlayingOscillator) {
-        try {
-            state.currentPlayingOscillator.stop();
-        } catch(e) {}
-        state.currentPlayingOscillator = null;
+// Play a full chord (strum simulation)
+function playChord(chordName) {
+  const frets = CHORDS[chordName];
+  if (!frets) return;
+
+  const stringBases = [STRINGS.G, STRINGS.C, STRINGS.E, STRINGS.A];
+  
+  stringBases.forEach((baseFreq, index) => {
+    const fret = frets[index];
+    // Frequency formula: f = base * 2^(fret/12)
+    const freq = baseFreq * Math.pow(2, fret / 12);
+    // Strum delay: 0.05s between each string
+    playNote(freq, 1.2, index * 0.05);
+  });
+}
+
+// Tuner Logic
+let tunerInterval = null;
+let activeTunerPeg = null;
+
+function toggleTuner(stringName, button) {
+  const freq = STRINGS[stringName];
+  
+  if (activeTunerPeg === stringName) {
+    stopTuner();
+    return;
+  }
+
+  stopTuner();
+  activeTunerPeg = stringName;
+  button.classList.add('playing');
+
+  const ctx = getAudioContext();
+  const osc = ctx.createOscillator();
+  const gainNode = ctx.createGain();
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(freq, ctx.currentTime);
+  gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
+
+  osc.connect(gainNode);
+  gainNode.connect(ctx.destination);
+  osc.start();
+
+  tunerInterval = {
+    osc,
+    gainNode,
+    stop: () => {
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+      setTimeout(() => osc.stop(), 200);
+      button.classList.remove('playing');
     }
-    document.querySelectorAll('.peg-btn').forEach(b => b.classList.remove('playing'));
-    stopMetronome();
-    stopAutoScroll();
+  };
 }
 
-// --- CHORDS LOGIC ---
-const chordsContainer = document.getElementById('chords-container');
+function stopTuner() {
+  if (tunerInterval) {
+    tunerInterval.stop();
+    tunerInterval = null;
+    activeTunerPeg = null;
+  }
+}
 
+// Metronome Logic
+let metronomeInterval = null;
+let bpm = 100;
+let isMetronomePlaying = false;
+
+function playMetronomeClick() {
+  const ctx = getAudioContext();
+  const osc = ctx.createOscillator();
+  const gainNode = ctx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1000, ctx.currentTime);
+  gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+
+  osc.connect(gainNode);
+  gainNode.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.06);
+
+  // Visual flash
+  const visual = document.getElementById('metro-visual');
+  visual.classList.add('flash');
+  setTimeout(() => visual.classList.remove('flash'), 100);
+}
+
+function toggleMetronome() {
+  const btn = document.getElementById('btn-metro-toggle');
+  if (isMetronomePlaying) {
+    clearInterval(metronomeInterval);
+    isMetronomePlaying = false;
+    btn.textContent = 'Démarrer';
+  } else {
+    getAudioContext();
+    isMetronomePlaying = true;
+    btn.textContent = 'Arrêter';
+    playMetronomeClick();
+    metronomeInterval = setInterval(playMetronomeClick, (60 / bpm) * 1000);
+  }
+}
+
+function updateBPM(val) {
+  bpm = val;
+  document.getElementById('bpm-val').textContent = bpm;
+  if (isMetronomePlaying) {
+    clearInterval(metronomeInterval);
+    metronomeInterval = setInterval(playMetronomeClick, (60 / bpm) * 1000);
+  }
+}
+
+// Render Chord Diagrams
 function renderChords() {
-    chordsContainer.innerHTML = '';
-    CHORDS.forEach(chord => {
-        const isLearned = state.learnedChords.includes(chord.name);
-        const card = document.createElement('div');
-        card.className = 'chord-card';
-        card.innerHTML = `
-            <div class="chord-learned-badge" data-chord="${chord.name}">
-                ${isLearned ? '✅' : '⬜'}
-            </div>
-            <h3>${chord.name}</h3>
-            <div class="chord-diagram" id="diagram-${chord.name}"></div>
-            <button class="btn btn-small btn-secondary">Écouter</button>
-        `;
-        
-        // Play chord on card click (excluding badge click)
-        card.addEventListener('click', (e) => {
-            if (e.target.classList.contains('chord-learned-badge')) return;
-            strumChord(chord.notes);
-        });
-        
-        // Toggle learned status
-        const badge = card.querySelector('.chord-learned-badge');
-        badge.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleChordLearned(chord.name);
-        });
-        
-        chordsContainer.appendChild(card);
-        drawChordDiagram(`diagram-${chord.name}`, chord.frets);
-    });
-}
+  const grid = document.getElementById('chords-grid');
+  grid.innerHTML = '';
 
-function toggleChordLearned(chordName) {
-    const index = state.learnedChords.indexOf(chordName);
-    if (index > -1) {
-        state.learnedChords.splice(index, 1);
-    } else {
-        state.learnedChords.push(chordName);
-    }
-    localStorage.setItem('learnedChords', JSON.stringify(state.learnedChords));
-    renderChords();
-}
+  Object.keys(CHORDS).forEach(chordName => {
+    const frets = CHORDS[chordName];
+    const card = document.createElement('div');
+    card.className = 'chord-card';
+    card.onclick = () => playChord(chordName);
 
-// Dynamic SVG Chord Diagram Generator
-function drawChordDiagram(containerId, frets) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    
-    const width = 80;
-    const height = 100;
-    const numStrings = 4;
-    const numFrets = 5;
-    
-    const xSpacing = width / (numStrings + 1);
-    const ySpacing = height / (numFrets + 1);
-    
-    let svg = `<svg width="100%" height="100%" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
-    
-    // Draw Frets (horizontal lines)
-    for (let i = 1; i <= numFrets; i++) {
-        const y = i * ySpacing;
-        const strokeWidth = i === 1 ? 3 : 1; // Thicker nut
-        svg += `<line x1="${xSpacing}" y1="${y}" x2="${xSpacing * numStrings}" y2="${y}" stroke="#2c3e50" stroke-width="${strokeWidth}" />`;
+    // Generate Fretboard HTML
+    let fretboardHTML = `<div class="fretboard">`;
+    // Frets lines
+    for (let i = 1; i <= 4; i++) {
+      fretboardHTML += `<div class="fret-line" style="top: ${i * 25}px;"></div>`;
     }
-    
-    // Draw Strings (vertical lines)
-    for (let i = 1; i <= numStrings; i++) {
-        const x = i * xSpacing;
-        svg += `<line x1="${x}" y1="${ySpacing}" x2="${x}" y2="${ySpacing * numFrets}" stroke="#7f8c8d" stroke-width="1.5" />`;
+    // Strings lines
+    for (let i = 0; i < 4; i++) {
+      fretboardHTML += `<div class="string-line" style="left: ${10 + i * 20}px;"></div>`;
     }
-    
-    // Draw Finger Dots
+    // Finger dots
     frets.forEach((fret, stringIndex) => {
-        const x = (stringIndex + 1) * xSpacing;
-        if (fret > 0) {
-            // Dot on fret
-            const y = (fret * ySpacing) + (ySpacing / 2);
-            svg += `<circle cx="${x}" cy="${y}" r="5" fill="#e67e22" />`;
-        } else if (fret === 0) {
-            // Open string circle above nut
-            const y = ySpacing - 6;
-            svg += `<circle cx="${x}" cy="${y}" r="3" fill="none" stroke="#27ae60" stroke-width="1.5" />`;
-        }
+      if (fret > 0) {
+        const left = 10 + stringIndex * 20;
+        const top = (fret * 25) - 12.5;
+        fretboardHTML += `<div class="finger-dot" style="left: ${left}px; top: ${top}px;">${fret}</div>`;
+      }
     });
-    
-    svg += '</svg>';
-    container.innerHTML = svg;
+    fretboardHTML += `</div>`;
+
+    card.innerHTML = `
+      <div class="chord-name">${chordName}</div>
+      ${fretboardHTML}
+    `;
+    grid.appendChild(card);
+  });
 }
 
-// Synthesize a Ukulele Strum
-function strumChord(notes) {
-    const ctx = getAudioContext();
-    const now = ctx.currentTime;
-    
-    // Standard frequencies for notes
-    const noteFreqs = {
-        'G4': 392.00, 'C4': 261.63, 'E4': 329.63, 'A4': 440.00,
-        'C5': 523.25, 'F4': 349.23, 'D4': 293.66, 'B4': 493.88,
-        'Bb4': 466.16, 'F#4': 369.99, 'C#4': 277.18
-    };
-    
-    notes.forEach((note, index) => {
-        const freq = noteFreqs[note] || 261.63;
-        const osc = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-        
-        osc.type = 'triangle'; // Warmer, acoustic-like sound
-        osc.frequency.value = freq;
-        
-        // Strum effect: delay each string slightly
-        const stringDelay = index * 0.06;
-        const startTime = now + stringDelay;
-        
-        gainNode.gain.setValueAtTime(0, startTime);
-        gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 1.2);
-        
-        osc.connect(gainNode);
-        gainNode.connect(ctx.destination);
-        
-        osc.start(startTime);
-        osc.stop(startTime + 1.2);
-    });
-}
-
-// --- SONGS LOGIC ---
-const songsContainer = document.getElementById('songs-container');
-const songPlayer = document.getElementById('song-player');
-const closePlayerBtn = document.getElementById('close-player-btn');
-const playerTitle = document.getElementById('player-title');
-const playerArtist = document.getElementById('player-artist');
-const playerLyrics = document.getElementById('player-lyrics-content');
-const playerChordsBadges = document.getElementById('player-chords-badges');
-const scrollPlayBtn = document.getElementById('scroll-play-btn');
-
+// Render Songs List
 function renderSongs() {
-    songsContainer.innerHTML = '';
-    SONGS.forEach((song, index) => {
-        const card = document.createElement('div');
-        card.className = 'song-card';
-        card.innerHTML = `
-            <div class="song-info">
-                <h3>${song.title}</h3>
-                <p>${song.artist}</p>
-            </div>
-            <div class="song-meta">
-                <span class="difficulty-badge ${song.difficulty === 'Facile' ? 'easy' : 'medium'}">${song.difficulty}</span>
-                <span>➔</span>
-            </div>
-        `;
-        card.addEventListener('click', () => openSong(index));
-        songsContainer.appendChild(card);
-    });
+  const list = document.getElementById('song-list');
+  list.innerHTML = '';
+
+  SONGS.forEach(song => {
+    const card = document.createElement('div');
+    card.className = 'song-card';
+    card.onclick = () => showSongDetail(song);
+
+    const badges = song.chords.map(c => `<span class="chord-badge">${c}</span>`).join(' ');
+
+    card.innerHTML = `
+      <div class="song-title">${song.title}</div>
+      <div class="song-artist">${song.artist}</div>
+      <div class="song-chords-used">${badges}</div>
+    `;
+    list.appendChild(card);
+  });
 }
 
-function openSong(index) {
-    const song = SONGS[index];
-    playerTitle.textContent = song.title;
-    playerArtist.textContent = song.artist;
-    
-    // Render chord badges
-    playerChordsBadges.innerHTML = '';
-    song.chords.forEach(chord => {
-        const badge = document.createElement('span');
-        badge.className = 'chord-badge';
-        badge.textContent = chord;
-        badge.addEventListener('click', () => {
-            const chordData = CHORDS.find(c => c.name === chord);
-            if (chordData) strumChord(chordData.notes);
-        });
-        playerChordsBadges.appendChild(badge);
-    });
-    
-    // Format lyrics with inline chords
-    let formattedLyrics = song.lyrics.replace(/\[([A-Za-z0-9#]+)\]/g, '<span class="chord-inline">$1</span>');
-    playerLyrics.innerHTML = formattedLyrics;
-    
-    songPlayer.classList.remove('hidden');
+function showSongDetail(song) {
+  document.getElementById('songs-list-view').style.display = 'none';
+  const detailView = document.getElementById('song-detail-view');
+  detailView.classList.add('active');
+
+  document.getElementById('detail-title').textContent = song.title;
+  document.getElementById('detail-artist').textContent = song.artist;
+
+  // Format lyrics with clickable chords
+  let formattedLyrics = song.lyrics.replace(/\[([A-Za-z0-9#]+)\]/g, (match, chord) => {
+    return `<span class="chord-ref" onclick="playChord('${chord}')">${chord}</span>`;
+  });
+
+  document.getElementById('lyrics-content').innerHTML = formattedLyrics;
 }
 
-closePlayerBtn.addEventListener('click', () => {
-    songPlayer.classList.add('hidden');
-    stopAutoScroll();
-});
-
-// Auto Scroll Logic
-scrollPlayBtn.addEventListener('click', () => {
-    if (state.scrollPlaying) {
-        stopAutoScroll();
-    } else {
-        startAutoScroll();
-    }
-});
-
-function startAutoScroll() {
-    state.scrollPlaying = true;
-    scrollPlayBtn.textContent = '⏸ Pause';
-    scrollPlayBtn.classList.replace('btn-primary', 'btn-secondary');
-    
-    state.scrollInterval = setInterval(() => {
-        playerLyrics.scrollBy({
-            top: 1,
-            behavior: 'auto'
-        });
-    }, 40); // Adjust speed here
+function closeSongDetail() {
+  document.getElementById('song-detail-view').classList.remove('active');
+  document.getElementById('songs-list-view').style.display = 'block';
 }
 
-function stopAutoScroll() {
-    state.scrollPlaying = false;
-    scrollPlayBtn.textContent = '▶ Démarrer';
-    scrollPlayBtn.classList.replace('btn-secondary', 'btn-primary');
-    if (state.scrollInterval) {
-        clearInterval(state.scrollInterval);
-    }
+// SPA Router
+function switchTab(tabId) {
+  stopTuner();
+  if (isMetronomePlaying) toggleMetronome();
+
+  document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+  document.getElementById(tabId).classList.add('active');
+  document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+
+  if (tabId === 'songs') {
+    closeSongDetail();
+  }
 }
 
-// --- METRONOME LOGIC ---
-const metroBpmDisplay = document.getElementById('metro-bpm-display');
-const metroSlider = document.getElementById('metro-slider');
-const metroMinus = document.getElementById('metro-minus');
-const metroPlus = document.getElementById('metro-plus');
-const metroToggle = document.getElementById('metro-toggle');
-const metroVisual = document.getElementById('metro-visual-indicator');
+// Dark Mode Toggle
+function initDarkMode() {
+  const toggleBtn = document.getElementById('btn-theme');
+  const currentTheme = localStorage.getItem('theme') || 'light';
 
-function updateBpm(val) {
-    state.metronomeBpm = Math.max(40, Math.min(240, val));
-    metroBpmDisplay.textContent = state.metronomeBpm;
-    metroSlider.value = state.metronomeBpm;
-    
-    if (state.metronomePlaying) {
-        stopMetronome();
-        startMetronome();
-    }
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  updateThemeIcon(currentTheme);
+
+  toggleBtn.addEventListener('click', () => {
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    updateThemeIcon(theme);
+  });
 }
 
-metroSlider.addEventListener('input', (e) => updateBpm(parseInt(e.target.value)));
-metroMinus.addEventListener('click', () => updateBpm(state.metronomeBpm - 1));
-metroPlus.addEventListener('click', () => updateBpm(state.metronomeBpm + 1));
-
-metroToggle.addEventListener('click', () => {
-    if (state.metronomePlaying) {
-        stopMetronome();
-    } else {
-        startMetronome();
-    }
-});
-
-function startMetronome() {
-    state.metronomePlaying = true;
-    metroToggle.textContent = 'Arrêter';
-    metroToggle.classList.replace('btn-primary', 'btn-secondary');
-    
-    const intervalMs = (60 / state.metronomeBpm) * 1000;
-    state.metronomeInterval = setInterval(playMetronomeTick, intervalMs);
+function updateThemeIcon(theme) {
+  const icon = document.querySelector('#btn-theme i');
+  if (theme === 'dark') {
+    icon.className = 'fas fa-sun';
+  } else {
+    icon.className = 'fas fa-moon';
+  }
 }
 
-function stopMetronome() {
-    state.metronomePlaying = false;
-    metroToggle.textContent = 'Démarrer';
-    metroToggle.classList.replace('btn-secondary', 'btn-primary');
-    if (state.metronomeInterval) {
-        clearInterval(state.metronomeInterval);
-    }
-}
-
-function playMetronomeTick() {
-    const ctx = getAudioContext();
-    const osc = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    
-    osc.type = 'sine';
-    // Accentuate the first beat of 4
-    const isFirstBeat = state.metronomeBeatCount % 4 === 0;
-    osc.frequency.value = isFirstBeat ? 1000 : 800;
-    
-    gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-    
-    osc.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    
-    osc.start();
-    osc.stop(ctx.currentTime + 0.1);
-    
-    // Visual Flash
-    metroVisual.classList.add('flash');
-    setTimeout(() => {
-        metroVisual.classList.remove('flash');
-    }, 50);
-    
-    state.metronomeBeatCount++;
-}
-
-// --- PWA INSTALLATION HINT ---
+// PWA Installation Logic
 let deferredPrompt;
-const installBtn = document.getElementById('install-btn');
+const installBtn = document.getElementById('btn-install');
 
 window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'block';
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.classList.add('visible');
 });
 
 installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            installBtn.style.display = 'none';
-        }
-        deferredPrompt = null;
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
     }
+    deferredPrompt = null;
+    installBtn.classList.remove('visible');
+  }
 });
 
-// Service Worker Registration
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('Service Worker enregistré !', reg))
-            .catch(err => console.warn('Erreur d\'enregistrement du Service Worker', err));
-    });
-}
+window.addEventListener('appinstalled', () => {
+  installBtn.classList.remove('visible');
+  console.log('PWA installed successfully');
+});
 
-// Initial Render
-renderChords();
-renderSongs();
+// App Initialization
+window.addEventListener('DOMContentLoaded', () => {
+  initDarkMode();
+  renderChords();
+  renderSongs();
+
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('Service Worker Registered'))
+      .catch(err => console.error('Service Worker Failed', err));
+  }
+});

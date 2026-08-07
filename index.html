@@ -1,145 +1,105 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UkuAcademy - Apprendre le Ukulélé</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#e67e22">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪕</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪕</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UkuLearn - Apprendre le Ukulélé</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="theme-color" content="#d35400">
+  <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=192&q=80">
 </head>
 <body>
-    <header class="app-header">
-        <div class="logo">
-            <span class="logo-icon">🪕</span>
-            <h1>UkuAcademy</h1>
+
+  <header>
+    <div class="header-title">
+      <i class="fas fa-music"></i>
+      <span>UkuLearn</span>
+    </div>
+    <div class="header-actions">
+      <button id="btn-install" class="btn-install">
+        <i class="fas fa-download"></i> Installer
+      </button>
+      <button id="btn-theme" class="btn-icon" aria-label="Changer de thème">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Chords View -->
+    <section id="chords" class="view active">
+      <h2>Dictionnaire d'Accords</h2>
+      <p style="margin-bottom: 1rem; opacity: 0.8;">Cliquez sur un accord pour entendre sa sonorité.</p>
+      <div id="chords-grid" class="chords-grid"></div>
+    </section>
+
+    <!-- Tuner View -->
+    <section id="tuner" class="view">
+      <h2>Accordeur de Poche</h2>
+      <p style="margin-bottom: 1rem; opacity: 0.8;">Cliquez sur une clé pour jouer la note de référence en boucle.</p>
+      <div class="tuner-container">
+        <div class="tuner-pegs">
+          <button class="peg-btn" onclick="toggleTuner('G', this)">G <span>Sol</span></button>
+          <button class="peg-btn" onclick="toggleTuner('C', this)">C <span>Do</span></button>
+          <button class="peg-btn" onclick="toggleTuner('E', this)">E <span>Mi</span></button>
+          <button class="peg-btn" onclick="toggleTuner('A', this)">A <span>La</span></button>
         </div>
-        <div class="header-actions">
-            <button id="install-btn" class="btn btn-small btn-accent" style="display: none;">Installer l'app</button>
-        </div>
-    </header>
+      </div>
+    </section>
 
-    <main class="app-content">
-        <!-- Tuner View -->
-        <section id="view-tuner" class="app-view active">
-            <div class="card tuner-card">
-                <h2>Accordeur de Référence</h2>
-                <p class="subtitle">Cliquez sur une corde pour jouer sa note de référence (Accordage Standard G-C-E-A)</p>
-                <div class="tuner-pegs">
-                    <div class="peg-column">
-                        <button class="peg-btn" data-note="G4" data-freq="392.00">
-                            <span class="string-name">G</span>
-                            <span class="string-num">Sol (4e)</span>
-                        </button>
-                        <button class="peg-btn" data-note="C4" data-freq="261.63">
-                            <span class="string-name">C</span>
-                            <span class="string-num">Do (3e)</span>
-                        </button>
-                    </div>
-                    <div class="ukulele-head-graphic">
-                        <div class="neck-wood"></div>
-                    </div>
-                    <div class="peg-column">
-                        <button class="peg-btn" data-note="E4" data-freq="329.63">
-                            <span class="string-name">E</span>
-                            <span class="string-num">Mi (2e)</span>
-                        </button>
-                        <button class="peg-btn" data-note="A4" data-freq="440.00">
-                            <span class="string-name">A</span>
-                            <span class="string-num">La (1re)</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="tuner-controls">
-                    <button id="stop-tuner-btn" class="btn btn-secondary">Arrêter le son</button>
-                </div>
-            </div>
-        </section>
+    <!-- Songs View -->
+    <section id="songs" class="view">
+      <div id="songs-list-view">
+        <h2>Chansons Faciles</h2>
+        <p style="margin-bottom: 1rem; opacity: 0.8;">Choisissez un morceau pour vous entraîner.</p>
+        <div id="song-list" class="song-list"></div>
+      </div>
 
-        <!-- Chords View -->
-        <section id="view-chords" class="app-view">
-            <div class="view-header">
-                <h2>Dictionnaire d'Accords</h2>
-                <p class="subtitle">Apprenez et écoutez les accords de base</p>
-            </div>
-            <div class="chords-grid" id="chords-container"></div>
-        </section>
-
-        <!-- Songs View -->
-        <section id="view-songs" class="app-view">
-            <div class="view-header">
-                <h2>Chansons Faciles</h2>
-                <p class="subtitle">Pratiquez avec des morceaux simples</p>
-            </div>
-            <div class="songs-list" id="songs-container"></div>
-            
-            <!-- Song Player Modal/Overlay -->
-            <div id="song-player" class="song-player hidden">
-                <div class="player-header">
-                    <button id="close-player-btn" class="btn-back">← Retour</button>
-                    <h3 id="player-title">Titre de la chanson</h3>
-                    <span id="player-artist">Artiste</span>
-                </div>
-                <div class="player-toolbar">
-                    <div class="control-group">
-                        <label for="scroll-speed">Défilement auto :</label>
-                        <button id="scroll-play-btn" class="btn btn-small btn-primary">▶ Démarrer</button>
-                    </div>
-                    <div class="control-group">
-                        <label>Accords requis :</label>
-                        <div id="player-chords-badges" class="chord-badges"></div>
-                    </div>
-                </div>
-                <div class="player-lyrics" id="player-lyrics-content"></div>
-            </div>
-        </section>
-
-        <!-- Metronome View -->
-        <section id="view-metronome" class="app-view">
-            <div class="card metronome-card">
-                <h2>Métronome</h2>
-                <p class="subtitle">Gardez le rythme pour vos sessions d'entraînement</p>
-                
-                <div class="metro-display">
-                    <div class="metro-visual" id="metro-visual-indicator"></div>
-                    <div class="metro-bpm" id="metro-bpm-display">120</div>
-                    <div class="metro-label">BPM</div>
-                </div>
-
-                <div class="metro-controls">
-                    <button id="metro-minus" class="btn btn-round">-</button>
-                    <input type="range" id="metro-slider" min="40" max="240" value="120" class="slider">
-                    <button id="metro-plus" class="btn btn-round">+</button>
-                </div>
-
-                <div class="metro-actions">
-                    <button id="metro-toggle" class="btn btn-primary btn-large">Démarrer</button>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <nav class="app-nav">
-        <button class="nav-item active" data-target="view-tuner">
-            <span class="nav-icon">🔊</span>
-            <span class="nav-label">Accordeur</span>
+      <div id="song-detail-view" class="song-detail">
+        <button class="btn-icon" onclick="closeSongDetail()" style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
+          <i class="fas fa-arrow-left"></i> Retour aux chansons
         </button>
-        <button class="nav-item" data-target="view-chords">
-            <span class="nav-icon">🎵</span>
-            <span class="nav-label">Accords</span>
-        </button>
-        <button class="nav-item" data-target="view-songs">
-            <span class="nav-icon">📖</span>
-            <span class="nav-label">Chansons</span>
-        </button>
-        <button class="nav-item" data-target="view-metronome">
-            <span class="nav-icon">⏱️</span>
-            <span class="nav-label">Métronome</span>
-        </button>
-    </nav>
+        <h2 id="detail-title">Titre</h2>
+        <p id="detail-artist" style="opacity: 0.8; margin-bottom: 1rem;">Artiste</p>
+        <p style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 0.5rem;">Astuce : Cliquez sur les accords en orange pour les écouter.</p>
+        <div id="lyrics-content" class="lyrics-container"></div>
+      </div>
+    </section>
 
-    <script src="app.js"></script>
+    <!-- Metronome View -->
+    <section id="metronome" class="view">
+      <h2>Métronome</h2>
+      <div class="metronome-container">
+        <div id="bpm-val" class="bpm-display">100</div>
+        <div style="font-weight: bold; opacity: 0.8;">BPM</div>
+        <input type="range" id="bpm-slider" class="bpm-slider" min="40" max="240" value="100" oninput="updateBPM(this.value)">
+        <div id="metro-visual" class="metronome-visual"></div>
+        <button id="btn-metro-toggle" class="btn-primary" onclick="toggleMetronome()">Démarrer</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav-bar">
+    <button class="nav-item active" onclick="switchTab('chords')">
+      <i class="fas fa-guitar"></i>
+      <span>Accords</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('tuner')">
+      <i class="fas fa-adjust"></i>
+      <span>Accordeur</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('songs')">
+      <i class="fas fa-book-open"></i>
+      <span>Chansons</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('metronome')">
+      <i class="fas fa-clock"></i>
+      <span>Métronome</span>
+    </button>
+  </nav>
+
+  <script src="app.js"></script>
 </body>
 </html>
