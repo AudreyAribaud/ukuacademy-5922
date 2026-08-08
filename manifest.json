@@ -1,20 +1,20 @@
 {
   "name": "UkuAcademy - Apprendre le Ukulélé",
   "short_name": "UkuAcademy",
-  "description": "Apprenez le ukulélé facilement avec des grilles d'accords, un accordeur et un métronome intégrés.",
+  "description": "Une application interactive pour apprendre le ukulélé avec accordeur, métronome et grilles d'accords.",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#ff5a5f",
+  "background_color": "#0f172a",
+  "theme-color": "#6366f1",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3815/3815558.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3815/3815558.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
