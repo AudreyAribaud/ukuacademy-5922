@@ -1,275 +1,57 @@
-/* Reset & Base Styles */
-* {
-  box-sizing: border-box;
+/* Custom styles for no-scroll mobile layout */
+html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-:root {
-  --bg-color: #1e120c;
-  --card-bg: #2d1b12;
-  --card-active: #e67e22;
-  --text-color: #f5ebe6;
-  --text-muted: #bfa393;
-  --primary: #d35400;
-  --primary-hover: #e67e22;
-  --accent: #2ecc71;
-  --border-radius: 12px;
-  --header-height: 110px;
-  --footer-height: 100px;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  overflow: hidden; /* Prevent scrolling entirely */
-  height: 100dvh;
-  width: 100vw;
-}
-
-/* App Container Layout */
-.app-container {
-  display: flex;
-  flex-direction: column;
-  height: 100dvh;
+  overflow: hidden;
+  position: fixed;
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 8px;
-  justify-content: space-between;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Header */
-.app-header {
-  height: var(--header-height);
+/* Tab visibility */
+.tab-content {
+  display: none;
+}
+.tab-content.active {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 8px;
 }
 
-.logo-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* Active states */
+.chord-btn.active {
+  background-color: #0ea5e9 !important;
+  color: #0f172a !important;
+  border-color: #38bdf8 !important;
+  transform: scale(0.95);
 }
 
-.logo-icon {
-  font-size: 1.5rem;
-}
-
-.logo-title h1 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  background: linear-gradient(45deg, #ff9f43, #ff6b6b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.selectors {
-  display: flex;
-  gap: 8px;
-}
-
-select {
-  flex: 1;
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  outline: none;
+/* Custom range slider styling */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #38bdf8;
   cursor: pointer;
-  transition: border-color 0.2s;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
 }
 
-select:focus {
-  border-color: var(--primary);
+/* Pulse animation for active beat visualizer */
+@keyframes beat-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; background-color: #38bdf8; }
+}
+.beat-active {
+  animation: beat-pulse 0.2s ease-in-out;
+  background-color: #0ea5e9 !important;
+  box-shadow: 0 0 8px #0ea5e9;
 }
 
-/* Main Grid - Auto-fits the remaining space perfectly */
-.grid-container {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 8px;
-  margin: 8px 0;
-  min-height: 0; /* Crucial for nested flexbox/grid scrolling prevention */
-}
-
-/* Chord Card */
-.chord-card {
-  background-color: var(--card-bg);
-  border: 2px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--border-radius);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px;
-  position: relative;
-  transition: transform 0.1s, border-color 0.2s, background-color 0.2s;
-  cursor: pointer;
-  min-height: 0; /* Allows content to shrink */
-}
-
-.chord-card:active {
-  transform: scale(0.97);
-}
-
-.chord-card.playing {
-  border-color: var(--card-active);
-  background-color: rgba(230, 126, 34, 0.15);
-  box-shadow: 0 0 10px rgba(230, 126, 34, 0.3);
-}
-
-.chord-header {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 4px;
-}
-
-.chord-name {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #fff;
-}
-
-.chord-degree {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  text-transform: uppercase;
-}
-
-/* SVG Chord Diagram Container */
-.chord-diagram-svg {
-  flex: 1;
-  width: 100%;
-  max-height: 75%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.chord-diagram-svg svg {
-  height: 100%;
-  max-width: 100%;
-}
-
-/* Footer Controls */
-.app-controls {
-  height: var(--footer-height);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 8px;
-}
-
-.playback-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.control-btn {
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 0.95rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background-color 0.2s;
-  white-space: nowrap;
-}
-
-.control-btn:hover {
-  background-color: var(--primary-hover);
-}
-
-.control-btn.active {
-  background-color: var(--accent);
-}
-
-.tempo-control {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.tempo-control label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  display: flex;
-  justify-content: space-between;
-}
-
-.tempo-control input[type="range"] {
-  width: 100%;
-  accent-color: var(--primary);
-  height: 6px;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-.info-bar {
-  text-align: center;
-}
-
-.tip-text {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-/* Landscape & Tablet Adjustments */
-@media (min-height: 700px) {
-  .app-container {
-    padding: 16px;
-  }
-  .chord-name {
-    font-size: 1.6rem;
-  }
-}
-
-@media (max-height: 550px) {
-  :root {
-    --header-height: 85px;
-    --footer-height: 80px;
-  }
-  .logo-title h1 {
-    font-size: 1.1rem;
-  }
-  .chord-name {
-    font-size: 1.1rem;
-  }
-  .chord-degree {
-    font-size: 0.65rem;
-  }
-  select {
-    padding: 4px 8px;
-    font-size: 0.8rem;
-  }
-  .control-btn {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-  }
+/* Active chord card in progression */
+.prog-chord-active {
+  border-color: #0ea5e9 !important;
+  background-color: rgba(14, 165, 233, 0.15) !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.3);
 }
