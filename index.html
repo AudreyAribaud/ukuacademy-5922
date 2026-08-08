@@ -2,189 +2,124 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>UkuAcademy</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0ea5e9">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UkuAcademy - Apprendre le Ukulélé</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#e67e22">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪕</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans select-none overflow-hidden h-screen flex flex-col">
-
-  <!-- Header -->
-  <header class="bg-slate-800 border-b border-slate-700 px-4 py-2 flex items-center justify-between shrink-0">
-    <div class="flex items-center gap-2">
-      <span class="text-2xl">🪕</span>
-      <h1 class="text-lg font-bold tracking-wider text-sky-400">UkuAcademy</h1>
-    </div>
-    <!-- Quick Tuner Bar -->
-    <div class="flex gap-1 bg-slate-900 p-1 rounded-lg border border-slate-700">
-      <button onclick="playTunerNote('G')" class="w-8 h-8 rounded bg-slate-800 hover:bg-sky-600 text-xs font-bold transition-colors">G</button>
-      <button onclick="playTunerNote('C')" class="w-8 h-8 rounded bg-slate-800 hover:bg-sky-600 text-xs font-bold transition-colors">C</button>
-      <button onclick="playTunerNote('E')" class="w-8 h-8 rounded bg-slate-800 hover:bg-sky-600 text-xs font-bold transition-colors">E</button>
-      <button onclick="playTunerNote('A')" class="w-8 h-8 rounded bg-slate-800 hover:bg-sky-600 text-xs font-bold transition-colors">A</button>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <span class="logo-icon">🪕</span>
+        <h1>UkuAcademy</h1>
+      </div>
+      <nav>
+        <button class="nav-btn active" data-tab="progressions">Suites d'Accords</button>
+        <button class="nav-btn" data-tab="dictionary">Dictionnaire</button>
+        <button class="nav-btn" data-tab="metronome">Métronome</button>
+      </nav>
+      <button id="install-btn" class="install-btn" style="display: none;">Installer l'App</button>
     </div>
   </header>
 
-  <!-- Main Content Area (No Scroll Container) -->
-  <main class="flex-1 flex flex-col overflow-hidden relative">
-    
-    <!-- TAB 1: CHORDS -->
-    <section id="tab-chords" class="tab-content active flex flex-col h-full p-3 gap-3">
-      <div class="grid grid-cols-4 gap-2 shrink-0">
-        <!-- Chord Selector Buttons -->
-        <button onclick="selectChord('C')" class="chord-btn active bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">C</button>
-        <button onclick="selectChord('G')" class="chord-btn bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">G</button>
-        <button onclick="selectChord('Am')" class="chord-btn bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">Am</button>
-        <button onclick="selectChord('F')" class="chord-btn bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">F</button>
-        <button onclick="selectChord('D')" class="chord-btn bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">D</button>
-        <button onclick="selectChord('Em')" class="chord-btn bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">Em</button>
-        <button onclick="selectChord('A')" class="chord-btn bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">A</button>
-        <button onclick="selectChord('Dm')" class="chord-btn bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">Dm</button>
-        <button onclick="selectChord('G7')" class="chord-btn bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">G7</button>
-        <button onclick="selectChord('C7')" class="chord-btn bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">C7</button>
-        <button onclick="selectChord('E7')" class="chord-btn bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">E7</button>
-        <button onclick="selectChord('Bb')" class="chord-btn bg-slate-800 border border-slate-700 py-2 rounded-lg font-bold text-sm hover:bg-slate-700 transition-all">B♭</button>
+  <main class="container">
+    <!-- SECTION: PROGRESSIONS -->
+    <section id="tab-progressions" class="tab-content active">
+      <div class="section-header">
+        <h2>Suites d'Accords Magiques</h2>
+        <p>Ces accords se marient parfaitement pour créer de superbes mélodies. Choisissez une ambiance et jouez !</p>
       </div>
 
-      <!-- Chord Visualizer Card -->
-      <div class="flex-1 bg-slate-800/50 border border-slate-700 rounded-xl p-3 flex flex-col items-center justify-between min-h-0">
-        <div class="text-center">
-          <h2 id="chord-title" class="text-2xl font-black text-sky-400">Accord de Do (C)</h2>
-          <p id="chord-fingering" class="text-xs text-slate-400 mt-0.5">Index: - | Majeur: - | Annulaire: Frette 3</p>
-        </div>
-        
-        <!-- SVG Fretboard -->
-        <div class="w-full max-w-[160px] aspect-[3/4] flex items-center justify-center my-1">
-          <svg id="fretboard" viewBox="0 0 120 160" class="w-full h-full"></svg>
-        </div>
-
-        <button onclick="playCurrentChord()" class="w-full max-w-[200px] bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2.5 px-4 rounded-full flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20 active:scale-95 transition-all shrink-0">
-          <i class="fa-solid fa-volume-high"></i> Écouter l'accord
-        </button>
-      </div>
-    </section>
-
-    <!-- TAB 2: PROGRESSIONS & STRUMMING -->
-    <section id="tab-progressions" class="tab-content hidden flex flex-col h-full p-3 gap-3">
-      <!-- Progression Selector -->
-      <div class="shrink-0">
-        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Suite d'accords</label>
-        <select id="progression-select" onchange="loadProgression()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-500">
-          <!-- Populated by JS -->
-        </select>
+      <div class="progression-selector">
+        <button class="prog-filter active" data-prog="pop">Pop Classique (Do / C)</button>
+        <button class="prog-filter" data-prog="island">Vibe des Îles (La min / Am)</button>
+        <button class="prog-filter" data-prog="jazz">Jazz Doux (Sol / G)</button>
+        <button class="prog-filter" data-prog="blues">Blues Traditionnel (Do / C)</button>
       </div>
 
-      <!-- Strumming Pattern Selector -->
-      <div class="shrink-0">
-        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Rythmique (Strumming)</label>
-        <select id="strum-select" onchange="loadStrumming()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-500">
-          <!-- Populated by JS -->
-        </select>
-      </div>
-
-      <!-- Visual Playback & Progress Area -->
-      <div class="flex-1 bg-slate-800/50 border border-slate-700 rounded-xl p-3 flex flex-col justify-between min-h-0">
-        <!-- Active Progression Chords Row -->
-        <div id="progression-chords-container" class="flex justify-around items-center gap-1 py-2">
-          <!-- Dynamic Chord Cards -->
-        </div>
-
-        <!-- Strumming Visualizer Grid -->
-        <div class="flex flex-col gap-1">
-          <div class="text-center text-xs text-slate-400 font-mono mb-1" id="strum-pattern-text">D - D - U - U - D - U</div>
-          <div id="strum-visualizer" class="grid grid-cols-8 gap-1 h-8">
-            <!-- Dynamic beat indicators -->
+      <div class="progression-display">
+        <div class="progression-info">
+          <h3 id="prog-title">Pop Classique</h3>
+          <p id="prog-desc">La progression la plus célèbre de la musique moderne. Facile et ultra-efficace !</p>
+          <div class="prog-controls">
+            <button id="play-prog-btn" class="btn btn-primary">▶ Jouer la Suite</button>
+            <button id="stop-prog-btn" class="btn btn-secondary" style="display:none;">⏹ Arrêter</button>
+            <div class="tempo-input-group">
+              <label for="prog-tempo">Tempo :</label>
+              <input type="number" id="prog-tempo" value="100" min="40" max="240"> BPM
+            </div>
           </div>
         </div>
-
-        <!-- Playback Controls -->
-        <div class="flex items-center justify-between gap-4 mt-2 shrink-0">
-          <div class="flex items-center gap-2 flex-1">
-            <span class="text-xs text-slate-400 font-mono w-12" id="bpm-display">100 BPM</span>
-            <input type="range" id="bpm-slider" min="60" max="180" value="100" oninput="updateBPM(this.value)" class="flex-1 accent-sky-500 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
-          </div>
-          
-          <button id="play-progression-btn" onclick="toggleProgressionPlay()" class="w-12 h-12 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
-            <i class="fa-solid fa-play text-lg ml-0.5"></i>
-          </button>
+        <div class="chord-grid" id="progression-chords-container">
+          <!-- Dynamically filled -->
         </div>
       </div>
     </section>
 
-    <!-- TAB 3: TUNER & TOOLS -->
-    <section id="tab-tuner" class="tab-content hidden flex flex-col h-full p-3 gap-3">
-      <div class="flex-1 bg-slate-800/50 border border-slate-700 rounded-xl p-4 flex flex-col items-center justify-around min-h-0">
-        <div class="text-center">
-          <h2 class="text-xl font-bold text-sky-400">Accordeur de Référence</h2>
-          <p class="text-xs text-slate-400 mt-1">Appuyez sur une corde pour jouer sa note de référence</p>
-        </div>
-
-        <!-- Interactive Ukulele Headstock/Strings -->
-        <div class="relative w-full max-w-[220px] aspect-[2/3] flex justify-between px-6 py-4 bg-slate-900/80 border border-slate-700 rounded-2xl">
-          <!-- Vertical Strings Visual -->
-          <div class="absolute inset-y-0 left-[25%] w-[1px] bg-slate-600"></div>
-          <div class="absolute inset-y-0 left-[41.6%] w-[1px] bg-slate-600"></div>
-          <div class="absolute inset-y-0 left-[58.3%] w-[1px] bg-slate-600"></div>
-          <div class="absolute inset-y-0 left-[75%] w-[1px] bg-slate-600"></div>
-
-          <!-- String Buttons -->
-          <div class="flex flex-col justify-between items-center h-full z-10 w-full">
-            <div class="flex justify-between w-full">
-              <button onclick="playTunerNote('G')" class="tuner-btn w-12 h-12 rounded-full bg-slate-800 border-2 border-sky-500/50 hover:border-sky-400 flex flex-col items-center justify-center active:scale-95 transition-all">
-                <span class="text-sm font-black text-sky-400">G</span>
-                <span class="text-[9px] text-slate-400">Sol</span>
-              </button>
-              <button onclick="playTunerNote('A')" class="tuner-btn w-12 h-12 rounded-full bg-slate-800 border-2 border-sky-500/50 hover:border-sky-400 flex flex-col items-center justify-center active:scale-95 transition-all">
-                <span class="text-sm font-black text-sky-400">A</span>
-                <span class="text-[9px] text-slate-400">La</span>
-              </button>
-            </div>
-            
-            <div class="text-center py-4">
-              <div class="w-16 h-16 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-2xl shadow-inner">
-                🪕
-              </div>
-            </div>
-
-            <div class="flex justify-between w-full">
-              <button onclick="playTunerNote('C')" class="tuner-btn w-12 h-12 rounded-full bg-slate-800 border-2 border-sky-500/50 hover:border-sky-400 flex flex-col items-center justify-center active:scale-95 transition-all">
-                <span class="text-sm font-black text-sky-400">C</span>
-                <span class="text-[9px] text-slate-400">Do</span>
-              </button>
-              <button onclick="playTunerNote('E')" class="tuner-btn w-12 h-12 rounded-full bg-slate-800 border-2 border-sky-500/50 hover:border-sky-400 flex flex-col items-center justify-center active:scale-95 transition-all">
-                <span class="text-sm font-black text-sky-400">E</span>
-                <span class="text-[9px] text-slate-400">Mi</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <button onclick="stopAllAudio()" class="bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-bold py-1.5 px-4 rounded-full transition-all">
-          <i class="fa-solid fa-stop mr-1"></i> Arrêter le son
-        </button>
+    <!-- SECTION: DICTIONARY -->
+    <section id="tab-dictionary" class="tab-content">
+      <div class="section-header">
+        <h2>Dictionnaire d'Accords Interactif</h2>
+        <p>Cliquez sur un accord pour l'entendre sonner sur votre ukulélé virtuel.</p>
+      </div>
+      <div class="chord-search-container">
+        <input type="text" id="chord-search" placeholder="Rechercher un accord (ex: C, Am, G...)">
+      </div>
+      <div class="chord-grid" id="dictionary-chords-container">
+        <!-- Dynamically filled -->
       </div>
     </section>
 
+    <!-- SECTION: METRONOME -->
+    <section id="tab-metronome" class="tab-content">
+      <div class="section-header">
+        <h2>Métronome Intégré</h2>
+        <p>Gardez le rythme parfait pour vos sessions d'entraînement.</p>
+      </div>
+
+      <div class="metronome-card">
+        <div class="visual-indicator" id="metronome-indicator">
+          <div class="beat-dot"></div>
+          <div class="beat-dot"></div>
+          <div class="beat-dot"></div>
+          <div class="beat-dot"></div>
+        </div>
+
+        <div class="tempo-display">
+          <span id="bpm-value">100</span>
+          <span class="bpm-unit">BPM</span>
+        </div>
+
+        <div class="tempo-slider-container">
+          <button class="tempo-btn" id="tempo-minus">-</button>
+          <input type="range" id="tempo-slider" min="40" max="220" value="100">
+          <button class="tempo-btn" id="tempo-plus">+</button>
+        </div>
+
+        <div class="metronome-controls">
+          <button id="metro-toggle" class="btn btn-large btn-primary">Démarrer</button>
+          <button id="tap-tempo-btn" class="btn btn-secondary">Tap Tempo</button>
+        </div>
+
+        <div class="sound-selector">
+          <label for="metro-sound">Son :</label>
+          <select id="metro-sound">
+            <option value="woodblock">Bloc de bois</option>
+            <option value="beep">Bip Électronique</option>
+            <option value="snap">Claquement de doigts</option>
+          </select>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- Footer Navigation (Tabs) -->
-  <nav class="bg-slate-800 border-t border-slate-700 h-16 shrink-0 flex justify-around items-center">
-    <button onclick="switchTab('chords')" id="nav-chords" class="nav-btn flex flex-col items-center justify-center flex-1 h-full text-sky-400">
-      <i class="fa-solid fa-guitar text-lg"></i>
-      <span class="text-[10px] font-semibold mt-1">Accords</span>
-    </button>
-    <button onclick="switchTab('progressions')" id="nav-progressions" class="nav-btn flex flex-col items-center justify-center flex-1 h-full text-slate-400 hover:text-slate-200">
-      <i class="fa-solid fa-sliders text-lg"></i>
-      <span class="text-[10px] font-semibold mt-1">Suites & Rythmes</span>
-    </button>
-    <button onclick="switchTab('tuner')" id="nav-tuner" class="nav-btn flex flex-col items-center justify-center flex-1 h-full text-slate-400 hover:text-slate-200">
-      <i class="fa-solid fa-tuning-fork text-lg"></i>
-      <span class="text-[10px] font-semibold mt-1">Accordeur</span>
-    </button>
-  </nav>
+  <footer>
+    <p>Fait avec ❤️ pour les amoureux du Ukulélé • UkuAcademy 2024</p>
+  </footer>
 
   <script src="app.js"></script>
 </body>
