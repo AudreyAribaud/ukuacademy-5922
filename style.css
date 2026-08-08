@@ -1,71 +1,89 @@
 :root {
-  --bg-color: #f8fafc;
-  --text-color: #0f172a;
-  --primary-color: #4f46e5;
-  --primary-hover: #4338ca;
-  --card-bg: #ffffff;
-  --border-color: #e2e8f0;
-  --active-tab: #4f46e5;
-  --inactive-tab: #64748b;
-  --shadow: 0 1px 3px rgba(0,0,0,0.1);
+  --bg-app: #F9FAFB;
+  --bg-card: #FFFFFF;
+  --text-main: #1F2937;
+  --text-muted: #6B7280;
+  --primary: #8B5CF6;
+  --primary-hover: #7C3AED;
+  --primary-light: #EDE9FE;
+  --border: #E5E7EB;
+  --accent: #F59E0B;
+  --fret-color: #4B5563;
+  --string-color: #9CA3AF;
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-.dark-theme {
-  --bg-color: #0f172a;
-  --text-color: #f8fafc;
-  --primary-color: #6366f1;
-  --primary-hover: #4f46e5;
-  --card-bg: #1e293b;
-  --border-color: #334155;
-  --active-tab: #38bdf8;
-  --inactive-tab: #94a3b8;
-  --shadow: 0 1px 3px rgba(0,0,0,0.5);
+.dark {
+  --bg-app: #111827;
+  --bg-card: #1F2937;
+  --text-main: #F9FAFB;
+  --text-muted: #9CA3AF;
+  --primary: #A78BFA;
+  --primary-hover: #8B5CF6;
+  --primary-light: #312E81;
+  --border: #374151;
+  --fret-color: #9CA3AF;
+  --string-color: #4B5563;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  user-select: none;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  transition: background-color 0.3s, color 0.3s;
+  overflow: hidden;
   height: 100vh;
   height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition: background-color 0.3s, color 0.3s;
 }
 
-header {
-  height: 56px;
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  background-color: var(--bg-app);
+  position: relative;
+  box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}
+
+.app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
-  background-color: var(--card-bg);
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: var(--shadow);
+  padding: 12px 16px;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border);
   z-index: 10;
 }
 
-.logo {
+.logo-area {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.logo h1 {
-  font-size: 1.1rem;
-  font-weight: 700;
+.logo-icon {
+  font-size: 1.4rem;
 }
 
-.actions {
+.app-header h1 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-actions {
   display: flex;
   gap: 8px;
 }
@@ -75,107 +93,106 @@ header {
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  padding: 8px;
+  padding: 6px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-color);
+  color: var(--text-main);
   transition: background-color 0.2s;
 }
 
 .btn-icon:hover {
-  background-color: var(--border-color);
+  background-color: var(--primary-light);
 }
 
-main {
+.app-content {
   flex: 1;
+  overflow-y: auto;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   position: relative;
 }
 
-.tab-content {
+.tab-panel {
   display: none;
   flex-direction: column;
+  gap: 12px;
   height: 100%;
-  padding: 12px;
-  overflow: hidden;
 }
 
-.tab-content.active {
+.tab-panel.active {
   display: flex;
 }
 
-/* TAB 1: ACCORDS */
-#tab-chords {
-  display: none;
-  grid-template-rows: auto 1fr;
-  gap: 12px;
-}
-#tab-chords.active {
-  display: grid;
+/* CHORDS TAB */
+.chord-selector {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 8px;
+  border: 1px solid var(--border);
 }
 
 .chord-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 6px;
-  max-height: 130px;
-  overflow-y: auto;
-  padding-right: 4px;
 }
 
 .chord-btn {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
+  background-color: var(--bg-app);
+  border: 1px solid var(--border);
+  color: var(--text-main);
   padding: 8px 4px;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
-  text-align: center;
 }
 
 .chord-btn.active {
-  background-color: var(--primary-color);
-  color: #ffffff;
-  border-color: var(--primary-color);
+  background-color: var(--primary);
+  color: #FFFFFF;
+  border-color: var(--primary);
+  transform: scale(1.05);
 }
 
-.chord-display {
+.chord-display-card {
   flex: 1;
-  background-color: var(--card-bg);
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  box-shadow: var(--shadow);
-  overflow: hidden;
+  min-height: 0; /* allows shrinking in flex container */
 }
 
-.chord-display h2 {
-  font-size: 1.4rem;
-  margin-bottom: 2px;
+.chord-display-card h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
 }
 
-.svg-container {
+.fretboard-container {
   flex: 1;
   width: 100%;
-  max-height: 160px;
+  max-height: 180px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+#fretboard-svg {
+  height: 100%;
+  max-width: 150px;
+}
+
 .btn-primary {
-  background-color: var(--primary-color);
+  background-color: var(--primary);
   color: white;
   border: none;
   padding: 10px 24px;
@@ -183,39 +200,46 @@ main {
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
-  width: 80%;
+  width: 100%;
   max-width: 200px;
-  transition: background-color 0.2s;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2);
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .btn-primary:active {
   transform: scale(0.98);
 }
 
-/* TAB 2: PROGRESSIONS */
-#tab-progressions {
-  display: none;
-  grid-template-rows: 1fr auto;
-  gap: 12px;
-}
-#tab-progressions.active {
-  display: grid;
+/* PROGRESSIONS TAB */
+.section-header {
+  text-align: center;
+  margin-bottom: 4px;
 }
 
-.progression-list {
+.section-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.section-header p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.progressions-list {
+  flex: 1;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  overflow-y: auto;
   padding-right: 4px;
 }
 
-.prog-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 10px;
+.progression-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
@@ -223,147 +247,139 @@ main {
   gap: 6px;
 }
 
-.prog-card.active {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px var(--primary-color);
+.progression-card.active {
+  border-color: var(--primary);
+  background-color: var(--primary-light);
 }
 
-.prog-header {
+.progression-info {
   display: flex;
   justify-content: space-between;
-  font-weight: 600;
-  font-size: 0.85rem;
+  align-items: center;
 }
 
-.prog-desc {
+.progression-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.progression-genre {
   font-size: 0.75rem;
-  color: var(--inactive-tab);
+  color: var(--text-muted);
+  background-color: var(--bg-app);
+  padding: 2px 6px;
+  border-radius: 10px;
 }
 
-.prog-chords {
+.progression-chords {
   display: flex;
   gap: 6px;
 }
 
-.prog-chord-badge {
-  background-color: var(--border-color);
+.progression-chord-badge {
+  background-color: var(--bg-app);
+  border: 1px solid var(--border);
   padding: 4px 8px;
   border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  transition: background-color 0.2s;
-}
-
-.prog-chord-badge.playing {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.progression-controls {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.tempo-control {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.tempo-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.tempo-control input {
-  width: 100%;
-  accent-color: var(--primary-color);
-}
-
-/* TAB 3: ACCORDEUR */
-#tab-tuner {
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 12px;
-}
-
-.tuner-instruction {
   font-size: 0.85rem;
+  font-weight: 700;
+  flex: 1;
   text-align: center;
-  color: var(--inactive-tab);
+  transition: all 0.2s;
 }
 
-.tuner-grid {
+.progression-card.active .progression-chord-badge {
+  background-color: var(--bg-card);
+}
+
+.progression-chord-badge.playing {
+  background-color: var(--accent) !important;
+  color: white;
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
+
+.progression-player {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.btn-secondary {
+  background-color: #EF4444;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+/* TUNER TAB */
+.tuner-card {
+  background-color: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  height: 100%;
+}
+
+.tuner-pegs {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 16px;
   width: 100%;
   max-width: 260px;
 }
 
-.tuner-key {
-  background-color: var(--card-bg);
-  border: 2px solid var(--border-color);
-  color: var(--text-color);
-  border-radius: 50%;
-  aspect-ratio: 1;
+.peg-btn {
+  background-color: var(--bg-app);
+  border: 2px solid var(--border);
+  color: var(--text-main);
+  padding: 16px;
+  border-radius: 16px;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  cursor: pointer;
+  gap: 4px;
   transition: all 0.2s;
-  box-shadow: var(--shadow);
 }
 
-.tuner-key strong {
+.peg-btn:active, .peg-btn.playing {
+  border-color: var(--primary);
+  background-color: var(--primary-light);
+  transform: scale(0.98);
+}
+
+.peg-btn strong {
   font-size: 1.6rem;
 }
 
-.tuner-key .freq {
-  font-size: 0.7rem;
-  color: var(--inactive-tab);
+.peg-btn small {
+  color: var(--text-muted);
+  font-size: 0.8rem;
 }
 
-.tuner-key.playing {
-  border-color: var(--primary-color);
-  background-color: rgba(99, 102, 241, 0.1);
-  transform: scale(1.05);
+.tuner-tip {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
 }
 
-.tuner-visualizer {
+/* NAVIGATION BAR */
+.app-nav {
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 6px;
-  height: 30px;
-  width: 100%;
-}
-
-.wave-bar {
-  width: 6px;
-  height: 4px;
-  background-color: var(--primary-color);
-  border-radius: 3px;
-  transition: height 0.1s ease;
-}
-
-/* BOTTOM NAV */
-.bottom-nav {
-  height: 56px;
-  display: flex;
-  background-color: var(--card-bg);
-  border-top: 1px solid var(--border-color);
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  background-color: var(--bg-card);
+  border-top: 1px solid var(--border);
+  padding-bottom: var(--safe-area-bottom);
   z-index: 10;
 }
 
@@ -371,59 +387,42 @@ main {
   flex: 1;
   background: none;
   border: none;
+  padding: 8px 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  color: var(--inactive-tab);
+  justify-content: center;
+  gap: 4px;
   cursor: pointer;
-  gap: 2px;
+  color: var(--text-muted);
   transition: color 0.2s;
 }
 
 .nav-item.active {
-  color: var(--active-tab);
+  color: var(--primary);
 }
 
 .nav-icon {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 
 .nav-label {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
-/* SVG Chord Diagram Styles */
-.chord-line {
-  stroke: var(--text-color);
-  stroke-width: 1.5;
+.hidden {
+  display: none !important;
 }
-.fret-line {
-  stroke: var(--text-color);
-  stroke-width: 1.5;
+
+/* Scrollbar styling for clean look */
+::-webkit-scrollbar {
+  width: 4px;
 }
-.nut-line {
-  stroke: var(--text-color);
-  stroke-width: 4;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
-.chord-dot {
-  fill: var(--primary-color);
-  stroke: #ffffff;
-  stroke-width: 1.5;
-}
-.open-string {
-  fill: none;
-  stroke: var(--inactive-tab);
-  stroke-width: 1.5;
-}
-.muted-string {
-  stroke: #ef4444;
-  stroke-width: 2;
-}
-.chord-text {
-  fill: var(--text-color);
-  font-size: 8px;
-  font-family: sans-serif;
-  text-anchor: middle;
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
 }
