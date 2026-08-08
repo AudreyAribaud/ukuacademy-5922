@@ -1,365 +1,356 @@
-// Audio Engine using Web Audio API
-const AudioEngine = {
-  ctx: null,
-  // Standard Ukulele Tuning: G4 (392Hz), C4 (261.63Hz), E4 (329.63Hz), A4 (440Hz)
-  stringFrequencies: [392.00, 261.63, 329.63, 440.00],
+// Ukulele Chord Library Fingerings (G-C-E-A strings)
+const CHORD_LIBRARY = {
+  'C': [0, 0, 0, 3],
+  'G': [0, 2, 3, 2],
+  'Am': [2, 0, 0, 0],
+  'F': [2, 0, 1, 0],
+  'D': [2, 2, 2, 0],
+  'Em': [0, 4, 3, 2],
+  'Dm7': [2, 2, 1, 3],
+  'G7': [0, 2, 1, 2],
+  'Cmaj7': [0, 0, 0, 2],
+  'A': [2, 1, 0, 0],
+  'D7': [2, 0, 2, 0],
+  'E7': [1, 2, 0, 2]
+};
 
-  init() {
-    if (!this.ctx) {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
+// Chord Progressions
+const PROGRESSIONS = {
+  'pop-c': {
+    chords: ['C', 'G', 'Am', 'F'],
+    tip: "L'enchaînement le plus célèbre de la musique pop ! Transition clé : gardez l'index pivot pour passer de Am à F."
   },
-
-  playPluck(freq, delay = 0, duration = 1.2) {
-    this.init();
-    const osc = this.ctx.createOscillator();
-    const gainNode = this.ctx.createGain();
-    
-    // Ukulele pluck timbre simulation (combination of triangle and sine)
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq, this.ctx.currentTime + delay);
-    
-    // Fast attack, exponential decay
-    gainNode.gain.setValueAtTime(0, this.ctx.currentTime + delay);
-    gainNode.gain.linearRampToValueAtTime(0.4, this.ctx.currentTime + delay + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + delay + duration);
-    
-    osc.connect(gainNode);
-    gainNode.connect(this.ctx.destination);
-    
-    osc.start(this.ctx.currentTime + delay);
-    osc.stop(this.ctx.currentTime + delay + duration);
+  'folk-g': {
+    chords: ['G', 'D', 'Em', 'C'],
+    tip: "Idéal pour les ballades folk. Pour le G (Sol), formez un triangle bien stable avec vos doigts."
   },
-
-  playChord(frets, speed = 0.06) {
-    this.init();
-    frets.forEach((fret, stringIndex) => {
-      if (fret === -1) return; // Muted string
-      // Calculate frequency based on fret: freq = base * 2^(fret/12)
-      const baseFreq = this.stringFrequencies[stringIndex];
-      const freq = baseFreq * Math.pow(2, fret / 12);
-      this.playPluck(freq, stringIndex * speed);
-    });
+  'sad-am': {
+    chords: ['Am', 'F', 'C', 'G'],
+    tip: "Une ambiance mélancolique et puissante. Parfait pour s'entraîner à enchaîner rapidement."
+  },
+  'jazz-c': {
+    chords: ['Cmaj7', 'Dm7', 'G7', 'C'],
+    tip: "Un son jazzy et chaleureux. Le Dm7 demande de barrer légèrement ou d'utiliser trois doigts serrés."
+  },
+  'blues-a': {
+    chords: ['A', 'D7', 'E7', 'A'],
+    tip: "Un blues classique en La. Accentuez bien le deuxième et le quatrième temps pour donner du swing !"
   }
 };
 
-// Chords Database
-const CHORDS = {
-  'C': { name: 'C (Do)', frets: [0, 0, 0, 3], fingers: [0, 0, 0, 3] },
-  'G': { name: 'G (Sol)', frets: [0, 2, 3, 2], fingers: [0, 1, 3, 2] },
-  'Am': { name: 'Am (La min)', frets: [2, 0, 0, 0], fingers: [2, 0, 0, 0] },
-  'F': { name: 'F (Fa)', frets: [2, 0, 1, 0], fingers: [2, 0, 1, 0] },
-  'Dm': { name: 'Dm (Ré min)', frets: [2, 2, 1, 0], fingers: [2, 3, 1, 0] },
-  'Em': { name: 'Em (Mi min)', frets: [0, 4, 3, 2], fingers: [0, 3, 2, 1] },
-  'A': { name: 'A (La)', frets: [2, 1, 0, 0], fingers: [2, 1, 0, 0] },
-  'D': { name: 'D (Ré)', frets: [2, 2, 2, 0], fingers: [1, 2, 3, 0] },
-  'G7': { name: 'G7', frets: [0, 2, 1, 2], fingers: [0, 2, 1, 3] },
-  'C7': { name: 'C7', frets: [0, 0, 0, 1], fingers: [0, 0, 0, 1] }
+// Strumming Patterns
+const STRUM_PATTERNS = {
+  'island': [
+    { action: '↓', label: 'Bas', duration: 1 },
+    { action: '-', label: 'pause', duration: 0.5 },
+    { action: '↓', label: 'Bas', duration: 0.5 },
+    { action: '↑', label: 'Haut', duration: 0.5 },
+    { action: '-', label: 'pause', duration: 0.5 },
+    { action: '↑', label: 'Haut', duration: 1 },
+    { action: '↓', label: 'Bas', duration: 0.5 },
+    { action: '↑', label: 'Haut', duration: 0.5 }
+  ],
+  'simple-4': [
+    { action: '↓', label: 'Bas', duration: 1 },
+    { action: '↓', label: 'Bas', duration: 1 },
+    { action: '↓', label: 'Bas', duration: 1 },
+    { action: '↓', label: 'Bas', duration: 1 }
+  ],
+  'folk': [
+    { action: '↓', label: 'Bas', duration: 1 },
+    { action: '↓', label: 'Bas', duration: 0.5 },
+    { action: '↑', label: 'Haut', duration: 0.5 },
+    { action: '↓', label: 'Bas', duration: 1 },
+    { action: '↓', label: 'Bas', duration: 0.5 },
+    { action: '↑', label: 'Haut', duration: 0.5 }
+  ],
+  'reggae': [
+    { action: '-', label: 'Chut', duration: 1 },
+    { action: '↑', label: 'Haut', duration: 1 },
+    { action: '-', label: 'Chut', duration: 1 },
+    { action: '↑', label: 'Haut', duration: 1 }
+  ],
+  'waltz': [
+    { action: '↓', label: 'Bas', duration: 1 },
+    { action: '↑', label: 'Haut', duration: 1 },
+    { action: '↑', label: 'Haut', duration: 1 }
+  ]
 };
 
-// Progressions Database
-const PROGRESSIONS = [
-  {
-    title: "Balade Pop",
-    genre: "Classique Pop",
-    chords: ["C", "G", "Am", "F"]
-  },
-  {
-    title: "Brise des Îles",
-    genre: "Reggae / Folk",
-    chords: ["C", "Am", "F", "G"]
-  },
-  {
-    title: "Coucher de Soleil",
-    genre: "Doux & Mélancolique",
-    chords: ["Dm", "G7", "C", "C7"]
-  },
-  {
-    title: "Jazz Léger",
-    genre: "Jazz Débutant",
-    chords: ["Am", "Dm", "G7", "C"]
-  },
-  {
-    title: "Énergie Rock",
-    genre: "Rock / Folk",
-    chords: ["G", "D", "Em", "C"]
-  }
-];
-
-// State Management
-let currentChordKey = 'C';
-let activeProgressionInterval = null;
-let deferredPrompt = null;
+// State Variables
+let audioCtx = null;
+let isPlaying = false;
+let bpm = 100;
+let currentBeat = 0;
+let nextNoteTime = 0.0;
+let timerID = null;
+const lookahead = 25.0; // ms
+const scheduleAheadTime = 0.1; // sec
 
 // DOM Elements
-const chordButtonsGrid = document.getElementById('chord-buttons-grid');
-const currentChordName = document.getElementById('current-chord-name');
-const fretboardSvg = document.getElementById('fretboard-svg');
-const playChordBtn = document.getElementById('play-chord-btn');
-const progressionsContainer = document.getElementById('progressions-container');
-const playProgressionBtn = document.getElementById('play-progression-btn');
-const stopProgressionBtn = document.getElementById('stop-progression-btn');
-const themeToggle = document.getElementById('theme-toggle');
-const installBtn = document.getElementById('install-btn');
-const navItems = document.querySelectorAll('.nav-item');
-const tabPanels = document.querySelectorAll('.tab-panel');
+const progressionSelect = document.getElementById('progression-select');
+const chordsContainer = document.getElementById('chords-container');
+const strumSelect = document.getElementById('strum-select');
+const strumPatternDisplay = document.getElementById('strum-pattern-display');
+const tipText = document.getElementById('tip-text');
+const metroToggle = document.getElementById('metro-toggle');
+const bpmSlider = document.getElementById('bpm-slider');
+const bpmDisplay = document.getElementById('bpm-display');
+const beatIndicators = [
+  document.getElementById('beat-1'),
+  document.getElementById('beat-2'),
+  document.getElementById('beat-3'),
+  document.getElementById('beat-4')
+];
 
 // Initialize App
-function init() {
-  renderChordButtons();
-  selectChord('C');
-  renderProgressions();
+window.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
-  setupTheme();
-}
+  loadProgression(progressionSelect.value);
+  loadStrumPattern(strumSelect.value);
+});
 
-// Render Chord Buttons
-function renderChordButtons() {
-  chordButtonsGrid.innerHTML = '';
-  Object.keys(CHORDS).forEach(key => {
-    const btn = document.createElement('button');
-    btn.className = `chord-btn ${key === currentChordKey ? 'active' : ''}`;
-    btn.textContent = key;
-    btn.addEventListener('click', () => selectChord(key));
-    chordButtonsGrid.appendChild(btn);
-  });
-}
-
-// Select and Render Chord
-function selectChord(key) {
-  currentChordKey = key;
-  document.querySelectorAll('.chord-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent === key);
-  });
-  
-  const chord = CHORDS[key];
-  currentChordName.textContent = chord.name;
-  drawFretboard(chord.frets, chord.fingers);
-}
-
-// Draw SVG Fretboard
-function drawFretboard(frets, fingers) {
-  const width = 120;
-  const height = 160;
-  const numStrings = 4;
-  const numFrets = 4; // We show 4 frets
-  
-  const xMargin = 20;
-  const yMargin = 20;
-  const stringSpacing = (width - xMargin * 2) / (numStrings - 1);
-  const fretSpacing = (height - yMargin * 2) / numFrets;
-
-  let svgContent = `
-    <!-- Nut (Saddle) -->
-    <line x1="${xMargin}" y1="${yMargin}" x2="${width - xMargin}" y2="${yMargin}" stroke="var(--fret-color)" stroke-width="4" />
-  `;
-
-  // Draw Frets
-  for (let i = 1; i <= numFrets; i++) {
-    const y = yMargin + i * fretSpacing;
-    svgContent += `<line x1="${xMargin}" y1="${y}" x2="${width - xMargin}" y2="${y}" stroke="var(--fret-color)" stroke-width="2" />`;
-  }
-
-  // Draw Strings
-  for (let i = 0; i < numStrings; i++) {
-    const x = xMargin + i * stringSpacing;
-    svgContent += `<line x1="${x}" y1="${yMargin}" x2="${x}" y2="${height - yMargin}" stroke="var(--string-color)" stroke-width="2" />`;
-  }
-
-  // Draw Dots (Fingering)
-  frets.forEach((fret, stringIndex) => {
-    const x = xMargin + stringIndex * stringSpacing;
-    if (fret === 0) {
-      // Open string indicator
-      svgContent += `<circle cx="${x}" cy="${yMargin - 8}" r="4" fill="none" stroke="var(--primary)" stroke-width="2" />`;
-    } else if (fret > 0) {
-      // Pressed fret dot
-      const y = yMargin + (fret - 0.5) * fretSpacing;
-      svgContent += `
-        <circle cx="${x}" cy="${y}" r="8" fill="var(--primary)" />
-        <text x="${x}" y="${y + 3}" font-size="9" font-weight="bold" fill="white" text-anchor="middle">${fingers[stringIndex] || ''}</text>
-      `;
-    }
-  });
-
-  fretboardSvg.innerHTML = svgContent;
-}
-
-// Render Progressions
-function renderProgressions() {
-  progressionsContainer.innerHTML = '';
-  PROGRESSIONS.forEach((prog, index) => {
-    const card = document.createElement('div');
-    card.className = `progression-card ${index === 0 ? 'active' : ''}`;
-    card.dataset.index = index;
-    
-    let chordsHtml = '';
-    prog.chords.forEach(c => {
-      chordsHtml += `<span class="progression-chord-badge" data-chord="${c}">${c}</span>`;
-    });
-
-    card.innerHTML = `
-      <div class="progression-info">
-        <span class="progression-title">${prog.title}</span>
-        <span class="progression-genre">${prog.genre}</span>
-      </div>
-      <div class="progression-chords">
-        ${chordsHtml}
-      </div>
-    `;
-
-    card.addEventListener('click', () => {
-      document.querySelectorAll('.progression-card').forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
-      stopProgression();
-    });
-
-    progressionsContainer.appendChild(card);
-  });
-}
-
-// Play Progression Loop
-function playProgression() {
-  const activeCard = document.querySelector('.progression-card.active');
-  if (!activeCard) return;
-  
-  const index = activeCard.dataset.index;
-  const progression = PROGRESSIONS[index];
-  const badges = activeCard.querySelectorAll('.progression-chord-badge');
-  
-  let currentStep = 0;
-  stopProgression();
-
-  playProgressionBtn.classList.add('hidden');
-  stopProgressionBtn.classList.remove('hidden');
-
-  const playStep = () => {
-    badges.forEach(b => b.classList.remove('playing'));
-    const activeBadge = badges[currentStep];
-    activeBadge.classList.add('playing');
-    
-    const chordKey = progression.chords[currentStep];
-    const chord = CHORDS[chordKey];
-    if (chord) {
-      AudioEngine.playChord(chord.frets);
-    }
-    
-    currentStep = (currentStep + 1) % progression.chords.length;
-  };
-
-  playStep();
-  activeProgressionInterval = setInterval(playStep, 1800); // 1.8s per chord
-}
-
-function stopProgression() {
-  if (activeProgressionInterval) {
-    clearInterval(activeProgressionInterval);
-    activeProgressionInterval = null;
-  }
-  document.querySelectorAll('.progression-chord-badge').forEach(b => b.classList.remove('playing'));
-  playProgressionBtn.classList.remove('hidden');
-  stopProgressionBtn.classList.add('hidden');
-}
-
-// Setup Event Listeners
 function setupEventListeners() {
-  // Play current chord
-  playChordBtn.addEventListener('click', () => {
-    const chord = CHORDS[currentChordKey];
-    if (chord) AudioEngine.playChord(chord.frets);
+  progressionSelect.addEventListener('change', (e) => {
+    loadProgression(e.target.value);
   });
 
-  // Progression controls
-  playProgressionBtn.addEventListener('click', playProgression);
-  stopProgressionBtn.addEventListener('click', stopProgression);
-
-  // Tuner pegs
-  document.querySelectorAll('.peg-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const note = btn.dataset.note;
-      let freq = 440;
-      if (note === 'G') freq = 392.00;
-      if (note === 'C') freq = 261.63;
-      if (note === 'E') freq = 329.63;
-      if (note === 'A') freq = 440.00;
-      
-      btn.classList.add('playing');
-      AudioEngine.playPluck(freq, 0, 1.5);
-      setTimeout(() => btn.classList.remove('playing'), 1500);
-    });
+  strumSelect.addEventListener('change', (e) => {
+    loadStrumPattern(e.target.value);
   });
 
-  // Navigation Tabs
-  navItems.forEach(item => {
-    item.addEventListener('click', () => {
-      navItems.forEach(nav => nav.classList.remove('active'));
-      tabPanels.forEach(panel => panel.classList.remove('active'));
-      
-      item.classList.add('active');
-      const targetTab = item.dataset.tab;
-      document.getElementById(targetTab).classList.add('active');
-      
-      // Stop progression if leaving the tab
-      if (targetTab !== 'tab-progressions') {
-        stopProgression();
-      }
-    });
+  bpmSlider.addEventListener('input', (e) => {
+    bpm = parseInt(e.target.value);
+    bpmDisplay.textContent = `${bpm} BPM`;
   });
 
-  // Theme Toggle
-  themeToggle.addEventListener('click', () => {
-    const isDark = document.body.classList.toggle('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    themeToggle.textContent = isDark ? '☀️' : '🌙';
-  });
+  metroToggle.addEventListener('click', toggleMetronome);
 }
 
-// Theme Setup
-function setupTheme() {
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark');
-    themeToggle.textContent = '☀️';
-  } else {
-    document.body.classList.remove('dark');
-    themeToggle.textContent = '🌙';
+// Load & Render Chords
+function loadProgression(key) {
+  const data = PROGRESSIONS[key];
+  if (!data) return;
+
+  chordsContainer.innerHTML = '';
+  data.chords.forEach(chordName => {
+    const frets = CHORD_LIBRARY[chordName] || [0, 0, 0, 0];
+    const card = createChordCard(chordName, frets);
+    chordsContainer.appendChild(card);
+  });
+
+  tipText.textContent = data.tip;
+}
+
+function createChordCard(name, frets) {
+  const card = document.createElement('div');
+  card.className = 'chord-card';
+
+  const title = document.createElement('div');
+  title.className = 'chord-name';
+  title.textContent = name;
+  card.appendChild(title);
+
+  // Generate SVG for Ukulele Chord
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 100 120');
+  svg.setAttribute('class', 'chord-svg');
+
+  // Draw Nut (Saddle)
+  const nut = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  nut.setAttribute('x1', '20');
+  nut.setAttribute('y1', '20');
+  nut.setAttribute('x2', '80');
+  nut.setAttribute('y2', '20');
+  nut.setAttribute('stroke', '#f5ebe0');
+  nut.setAttribute('stroke-width', '4');
+  svg.appendChild(nut);
+
+  // Draw 4 Strings (G, C, E, A)
+  for (let i = 0; i < 4; i++) {
+    const x = 20 + i * 20;
+    const string = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    string.setAttribute('x1', x);
+    string.setAttribute('y1', '20');
+    string.setAttribute('x2', x);
+    string.setAttribute('y2', '110');
+    string.setAttribute('stroke', '#d5bdaf');
+    string.setAttribute('stroke-width', '2');
+    svg.appendChild(string);
   }
-}
 
-// PWA Installation Prompt
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.classList.remove('hidden');
-});
+  // Draw 5 Frets
+  for (let i = 1; i <= 5; i++) {
+    const y = 20 + i * 18;
+    const fret = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    fret.setAttribute('x1', '20');
+    fret.setAttribute('y1', y);
+    fret.setAttribute('x2', '80');
+    fret.setAttribute('y2', y);
+    fret.setAttribute('stroke', '#5c4033');
+    fret.setAttribute('stroke-width', '1.5');
+    svg.appendChild(fret);
+  }
 
-installBtn.addEventListener('click', async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      installBtn.classList.add('hidden');
+  // Draw Finger Dots
+  frets.forEach((fretVal, stringIdx) => {
+    const x = 20 + stringIdx * 20;
+    if (fretVal > 0) {
+      // Dot on fret
+      const y = 20 + (fretVal - 0.5) * 18;
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', x);
+      dot.setAttribute('cy', y);
+      dot.setAttribute('r', '6');
+      dot.setAttribute('fill', '#e58f24');
+      svg.appendChild(dot);
+    } else if (fretVal === 0) {
+      // Open string indicator (circle above nut)
+      const openCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      openCircle.setAttribute('cx', x);
+      openCircle.setAttribute('cy', '10');
+      openCircle.setAttribute('r', '3');
+      openCircle.setAttribute('fill', 'none');
+      openCircle.setAttribute('stroke', '#2ec4b6');
+      openCircle.setAttribute('stroke-width', '1.5');
+      svg.appendChild(openCircle);
     }
-    deferredPrompt = null;
-  }
-});
+  });
 
-window.addEventListener('appinstalled', () => {
-  installBtn.classList.add('hidden');
-  deferredPrompt = null;
-});
+  card.appendChild(svg);
+  return card;
+}
 
-// Service Worker Registration
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('Service Worker enregistré !', reg.scope))
-      .catch(err => console.log('Erreur d\'enregistrement du Service Worker :', err));
+// Load & Render Strumming Pattern
+function loadStrumPattern(key) {
+  const pattern = STRUM_PATTERNS[key];
+  if (!pattern) return;
+
+  strumPatternDisplay.innerHTML = '';
+  pattern.forEach((beat, index) => {
+    const beatEl = document.createElement('div');
+    beatEl.className = 'strum-beat';
+    beatEl.id = `strum-beat-${index}`;
+
+    const arrow = document.createElement('span');
+    arrow.className = 'strum-arrow';
+    if (beat.action === '↓') {
+      arrow.textContent = '↓';
+      arrow.classList.add('arrow-up');
+    } else if (beat.action === '↑') {
+      arrow.textContent = '↑';
+      arrow.classList.add('arrow-down');
+    } else {
+      arrow.textContent = '•';
+      arrow.classList.add('arrow-mute');
+    }
+
+    const label = document.createElement('span');
+    label.className = 'strum-label';
+    label.textContent = beat.label;
+
+    beatEl.appendChild(arrow);
+    beatEl.appendChild(label);
+    strumPatternDisplay.appendChild(beatEl);
   });
 }
 
-// Run App
-init();
+// Metronome Engine (Web Audio API)
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+
+function scheduler() {
+  while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+    scheduleNextBeat(currentBeat, nextNoteTime);
+    advanceBeat();
+  }
+  timerID = setTimeout(scheduler, lookahead);
+}
+
+function scheduleNextBeat(beatNumber, time) {
+  // Play click sound
+  const osc = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  
+  osc.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  // Accent on beat 0 (first beat of measure)
+  if (beatNumber === 0) {
+    osc.frequency.value = 1000;
+  } else {
+    osc.frequency.value = 600;
+  }
+
+  gainNode.gain.setValueAtTime(0.15, time);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+
+  osc.start(time);
+  osc.stop(time + 0.1);
+
+  // Sync visual flash with audio thread
+  const delay = (time - audioCtx.currentTime) * 1000;
+  setTimeout(() => {
+    triggerVisualBeat(beatNumber);
+  }, Math.max(0, delay));
+}
+
+function advanceBeat() {
+  const secondsPerBeat = 60.0 / bpm;
+  nextNoteTime += secondsPerBeat;
+  currentBeat = (currentBeat + 1) % 4; // 4/4 time signature
+}
+
+function triggerVisualBeat(beatNumber) {
+  // Update Metronome Indicators
+  beatIndicators.forEach((indicator, idx) => {
+    if (idx === beatNumber) {
+      indicator.classList.add('active');
+      if (idx === 0) indicator.classList.add('accent');
+    } else {
+      indicator.classList.remove('active', 'accent');
+    }
+  });
+
+  // Highlight active strumming beat dynamically
+  const pattern = STRUM_PATTERNS[strumSelect.value];
+  if (pattern) {
+    const totalStrums = pattern.length;
+    // Map the 4 beats to the strumming pattern elements
+    const activeStrumIdx = Math.floor((beatNumber / 4) * totalStrums);
+    
+    for (let i = 0; i < totalStrums; i++) {
+      const strumEl = document.getElementById(`strum-beat-${i}`);
+      if (strumEl) {
+        if (i === activeStrumIdx) {
+          strumEl.classList.add('active');
+        } else {
+          strumEl.classList.remove('active');
+        }
+      }
+    }
+  }
+}
+
+function toggleMetronome() {
+  initAudio();
+  
+  if (isPlaying) {
+    isPlaying = false;
+    clearTimeout(timerID);
+    metroToggle.textContent = '▶ Démarrer';
+    metroToggle.classList.remove('btn-active');
+    // Reset visual indicators
+    beatIndicators.forEach(ind => ind.classList.remove('active', 'accent'));
+    document.querySelectorAll('.strum-beat').forEach(el => el.classList.remove('active'));
+  } else {
+    isPlaying = true;
+    currentBeat = 0;
+    nextNoteTime = audioCtx.currentTime + 0.05;
+    metroToggle.textContent = '⏹ Arrêter';
+    scheduler();
+  }
+}

@@ -3,90 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>UkuFlow - Apprendre le Ukulélé</title>
+  <title>UkuAcademy - Apprendre le Ukulélé</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#8B5CF6">
-  <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=192&h=192">
+  <meta name="theme-color" content="#8B5A2B">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪕</text></svg>">
 </head>
 <body>
   <div class="app-container">
+    <!-- HEADER & METRONOME -->
     <header class="app-header">
       <div class="logo-area">
-        <span class="logo-icon">🌴</span>
-        <h1>UkuFlow</h1>
+        <h1>🪕 UkuAcademy</h1>
+        <span class="subtitle">L'essentiel sur un seul écran</span>
       </div>
-      <div class="header-actions">
-        <button id="install-btn" class="btn-icon hidden" title="Installer l'application">
-          📥
-        </button>
-        <button id="theme-toggle" class="btn-icon" aria-label="Changer de thème">
-          🌙
-        </button>
+      
+      <div class="metronome-panel">
+        <div class="metro-controls">
+          <button id="metro-toggle" class="btn btn-primary">▶ Démarrer</button>
+          <div class="bpm-slider-container">
+            <span id="bpm-display">100 BPM</span>
+            <input type="range" id="bpm-slider" min="40" max="220" value="100">
+          </div>
+        </div>
+        <div class="metro-visual">
+          <div class="beat-indicator" id="beat-1"></div>
+          <div class="beat-indicator" id="beat-2"></div>
+          <div class="beat-indicator" id="beat-3"></div>
+          <div class="beat-indicator" id="beat-4"></div>
+        </div>
       </div>
     </header>
 
-    <main class="app-content">
-      <!-- TAB 1: CHORDS -->
-      <section id="tab-chords" class="tab-panel active">
-        <div class="chord-selector">
-          <div class="chord-grid" id="chord-buttons-grid"></div>
-        </div>
-        <div class="chord-display-card">
-          <h2 id="current-chord-name">C (Do)</h2>
-          <div class="fretboard-container">
-            <svg id="fretboard-svg" viewBox="0 0 120 160"></svg>
-          </div>
-          <button id="play-chord-btn" class="btn-primary">🔊 Jouer l'accord</button>
-        </div>
-      </section>
-
-      <!-- TAB 2: PROGRESSIONS -->
-      <section id="tab-progressions" class="tab-panel">
+    <!-- MAIN CONTENT (GRID LAYOUT, NO SCROLL) -->
+    <main class="app-main">
+      <!-- LEFT COLUMN: PROGRESSIONS & CHORDS -->
+      <section class="chord-section">
         <div class="section-header">
-          <h2>Suites d'accords magiques</h2>
-          <p>Des enchaînements parfaits pour débuter</p>
+          <h2>Enchaînements d'accords</h2>
+          <select id="progression-select" class="select-input">
+            <option value="pop-c">Pop Classique (Do Majeur)</option>
+            <option value="folk-g">Folk & Feu de Camp (Sol Majeur)</option>
+            <option value="sad-am">Mélancolique (La Mineur)</option>
+            <option value="jazz-c">Jazz d'été (Do Majeur)</option>
+            <option value="blues-a">Blues Rythmique (La Majeur)</option>
+          </select>
         </div>
-        <div class="progressions-list" id="progressions-container"></div>
-        <div class="progression-player">
-          <button id="play-progression-btn" class="btn-primary">▶️ Jouer la suite</button>
-          <button id="stop-progression-btn" class="btn-secondary hidden">⏹️ Arrêter</button>
+
+        <div class="chords-grid" id="chords-container">
+          <!-- Dynamic Chord Cards will be injected here -->
         </div>
       </section>
 
-      <!-- TAB 3: TUNER -->
-      <section id="tab-tuner" class="tab-panel">
-        <div class="tuner-card">
-          <h2>Accordeur de Poche</h2>
-          <p>Accordage standard (G C E A)</p>
-          <div class="tuner-pegs">
-            <button class="peg-btn" data-note="G"><strong>G</strong> <small>Sol</small></button>
-            <button class="peg-btn" data-note="C"><strong>C</strong> <small>Do</small></button>
-            <button class="peg-btn" data-note="E"><strong>E</strong> <small>Mi</small></button>
-            <button class="peg-btn" data-note="A"><strong>A</strong> <small>La</small></button>
+      <!-- RIGHT COLUMN: STRUMMING & RHYTHM -->
+      <section class="rhythm-section">
+        <div class="section-header">
+          <h2>Idées de Rythmes (Strumming)</h2>
+          <select id="strum-select" class="select-input">
+            <option value="island">Le fameux "Island Strum" (Pop)</option>
+            <option value="simple-4">Le 4/4 Simple (Débutant)</option>
+            <option value="folk">Le Folk Alterné</option>
+            <option value="reggae">Le Contretemps Reggae</option>
+            <option value="waltz">La Valse (3/4)</option>
+          </select>
+        </div>
+
+        <div class="strum-visualizer-container">
+          <div class="strum-pattern-display" id="strum-pattern-display">
+            <!-- Dynamic arrows will be injected here -->
           </div>
-          <div class="tuner-tip">
-            <p>Appuyez sur une corde pour entendre la note de référence.</p>
+          <div class="strum-guide">
+            <span class="legend"><span class="arrow-up">↓</span> Bas</span>
+            <span class="legend"><span class="arrow-down">↑</span> Haut</span>
+            <span class="legend"><span class="arrow-mute">-</span> Silence / Pause</span>
           </div>
+        </div>
+
+        <div class="tips-panel">
+          <h3>💡 Astuce du Pro</h3>
+          <p id="tip-text">Détendez votre poignet ! Le mouvement doit venir de l'articulation du poignet, pas de tout le bras. Utilisez l'index ou le pouce.</p>
         </div>
       </section>
     </main>
-
-    <nav class="app-nav">
-      <button class="nav-item active" data-tab="tab-chords">
-        <span class="nav-icon">🎸</span>
-        <span class="nav-label">Accords</span>
-      </button>
-      <button class="nav-item" data-tab="tab-progressions">
-        <span class="nav-icon">🎶</span>
-        <span class="nav-label">Suites</span>
-      </button>
-      <button class="nav-item" data-tab="tab-tuner">
-        <span class="nav-icon">🔔</span>
-        <span class="nav-label">Accordeur</span>
-      </button>
-    </nav>
   </div>
+
   <script src="app.js"></script>
 </body>
 </html>
