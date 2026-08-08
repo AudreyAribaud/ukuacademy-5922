@@ -1,194 +1,56 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UkuAcademy - Apprenez le Ukulélé</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ff7a59">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
-    <!-- Tailwind CSS for modern UI -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>UkuAcademy - Grilles d'Accords</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#8B4513">
+  <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪕</text></svg>">
 </head>
-<body class="bg-amber-50 text-slate-800 font-sans min-h-screen flex flex-col">
-
-    <!-- Header -->
-    <header class="bg-gradient-to-r content-header text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <span class="text-3xl">🌸</span>
-                <div>
-                    <h1 class="text-2xl font-bold tracking-wide">UkuAcademy</h1>
-                    <p class="text-xs opacity-90">Votre compagnon de ukulélé</p>
-                </div>
-            </div>
-            <nav class="hidden md:flex space-x-6 font-medium">
-                <a href="#chords" class="hover:text-amber-200 transition">Accords</a>
-                <a href="#progressions" class="hover:text-amber-200 transition">Suites d'Accords</a>
-                <a href="#composer" class="hover:text-amber-200 transition">Mon Compositeur</a>
-            </nav>
-            <button id="installBtn" class="hidden bg-white text-amber-600 px-4 py-2 rounded-full text-sm font-bold shadow hover:bg-amber-100 transition flex items-center space-x-2">
-                <i class="fa-solid fa-download"></i>
-                <span>Installer</span>
-            </button>
-        </div>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-title">
+        <span class="logo-icon">🪕</span>
+        <h1>UkuAcademy</h1>
+      </div>
+      <div class="selectors">
+        <select id="progression-select" aria-label="Sélectionner une progression">
+          <option value="pop">Pop/Rock (I-V-vi-IV)</option>
+          <option value="classic">Classic 50s (I-vi-IV-V)</option>
+          <option value="jazz">Jazz (ii-V-I)</option>
+          <option value="blues">Blues (I-IV-V)</option>
+          <option value="folk">Folk (vi-IV-I-V)</option>
+        </select>
+        <select id="key-select" aria-label="Sélectionner la tonalité">
+          <option value="C">Tonalité : Do (C)</option>
+          <option value="G">Tonalité : Sol (G)</option>
+          <option value="F">Tonalité : Fa (F)</option>
+        </select>
+      </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8 space-y-12">
-        
-        <!-- Hero Section -->
-        <section class="bg-white rounded-3xl p-6 md:p-10 shadow-md border border-amber-100 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div class="space-y-4 max-w-xl">
-                <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Nouveau : Suites d'accords magiques</span>
-                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight">Maîtrisez le Ukulélé en quelques minutes par jour !</h2>
-                <p class="text-slate-600 text-lg">Découvrez notre dictionnaire d'accords interactif et apprenez les suites d'accords harmonieuses qui font fureur dans toutes les chansons pop, folk et rock.</p>
-                <div class="flex flex-wrap gap-3">
-                    <a href="#progressions" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-amber-500/20 transition flex items-center space-x-2">
-                        <i class="fa-solid fa-music"></i>
-                        <span>Voir les suites d'accords</span>
-                    </a>
-                    <a href="#chords" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold px-6 py-3 rounded-xl transition">
-                        Dictionnaire d'accords
-                    </a>
-                </div>
-            </div>
-            <div class="w-full md:w-1/3 flex justify-center">
-                <div class="relative">
-                    <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 blur opacity-30 animate-pulse"></div>
-                    <div class="relative bg-amber-100 p-8 rounded-full w-48 h-48 flex items-center justify-center text-7xl shadow-inner">
-                        🎸
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Interactive Chord Dictionary -->
-        <section id="chords" class="space-y-6 scroll-mt-20">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h3 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-book-open text-amber-500"></i> Dictionnaire d'Accords
-                    </h3>
-                    <p class="text-slate-500">Cliquez sur un accord pour l'écouter et voir le diagramme de doigté.</p>
-                </div>
-                <!-- Filter buttons -->
-                <div class="flex flex-wrap gap-2" id="chordFilters">
-                    <button class="filter-btn active px-4 py-2 rounded-lg text-sm font-medium transition" data-filter="all">Tous</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition" data-filter="major">Majeurs</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition" data-filter="minor">Mineurs</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition" data-filter="7th">7ème</button>
-                </div>
-            </div>
-
-            <!-- Chords Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="chordsGrid">
-                <!-- Dynamically populated by JS -->
-            </div>
-        </section>
-
-        <!-- Chord Progressions (Suites d'accords) -->
-        <section id="progressions" class="space-y-6 scroll-mt-20">
-            <div>
-                <h3 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Suites d'Accords Magiques
-                </h3>
-                <p class="text-slate-500">Ces enchaînements d'accords sonnent merveilleusement bien ensemble. Lancez la lecture pour vous entraîner en rythme !</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-6" id="progressionsGrid">
-                <!-- Dynamically populated by JS -->
-            </div>
-        </section>
-
-        <!-- Custom Composer -->
-        <section id="composer" class="bg-white rounded-3xl p-6 md:p-8 shadow-md border border-amber-100 space-y-6 scroll-mt-20">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h3 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-amber-500"></i> Mon Compositeur de Suite d'Accords
-                    </h3>
-                    <p class="text-slate-500">Créez votre propre enchaînement d'accords personnalisé et écoutez le résultat.</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button id="clearComposer" class="text-slate-500 hover:text-red-500 text-sm font-medium transition flex items-center gap-1">
-                        <i class="fa-solid fa-trash-can"></i> Effacer tout
-                    </button>
-                </div>
-            </div>
-
-            <!-- Composer Workspace -->
-            <div class="bg-amber-50/50 rounded-2xl p-6 border-2 border-dashed border-amber-200 min-h-[150px] flex flex-wrap items-center justify-center gap-4" id="composerWorkspace">
-                <!-- Selected chords will appear here -->
-                <p class="text-slate-400 text-center py-4" id="composerPlaceholder">Cliquez sur les boutons d'accords ci-dessous pour composer votre suite...</p>
-            </div>
-
-            <!-- Composer Controls -->
-            <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-100">
-                <div class="flex items-center gap-4">
-                    <button id="playComposer" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-emerald-500/20 transition flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <i class="fa-solid fa-play"></i>
-                        <span>Jouer ma suite</span>
-                    </button>
-                    <button id="stopComposer" class="hidden bg-slate-600 hover:bg-slate-700 text-white font-bold px-6 py-3 rounded-xl transition flex items-center space-x-2">
-                        <i class="fa-solid fa-stop"></i>
-                        <span>Arrêter</span>
-                    </button>
-                    <div class="flex items-center gap-2">
-                        <label for="composerTempo" class="text-sm font-medium text-slate-600">Tempo:</label>
-                        <input type="range" id="composerTempo" min="60" max="180" value="100" class="w-24 accent-amber-500">
-                        <span id="tempoVal" class="text-sm font-bold text-slate-700 w-12">100 BPM</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Add Buttons -->
-            <div class="space-y-2">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Ajouter un accord :</p>
-                <div class="flex flex-wrap gap-2" id="composerQuickAdd">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Tips & Tricks -->
-        <section class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
-            <div class="absolute right-0 bottom-0 opacity-10 text-9xl transform translate-x-10 translate-y-10">
-                🎸
-            </div>
-            <div class="relative z-10 max-w-2xl space-y-4">
-                <h3 class="text-2xl font-bold">💡 Astuce de Pro : Comment bien enchaîner ?</h3>
-                <p class="text-amber-50 leading-relaxed">
-                    Pour réussir vos transitions d'accords, cherchez les <strong>doigts pivots</strong> (les doigts qui ne bougent pas entre deux accords). Par exemple, pour passer de <strong>Do (C)</strong> à <strong>La mineur (Am)</strong>, ou de <strong>Fa (F)</strong> à <strong>La mineur (Am)</strong>, gardez vos doigts en place et glissez simplement les autres !
-                </p>
-                <div class="pt-2">
-                    <span class="inline-block bg-white/20 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full">
-                        Accordage standard : G - C - E - A
-                    </span>
-                </div>
-            </div>
-        </section>
-
+    <main class="grid-container" id="chords-grid">
+      <!-- Les cartes d'accords seront injectées ici dynamiquement -->
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-8 mt-12 border-t border-slate-800">
-        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-2">
-                <span class="text-2xl">🌸</span>
-                <span class="text-white font-bold">UkuAcademy</span>
-            </div>
-            <p class="text-sm text-center md:text-left">&copy; 2024 UkuAcademy. Conçu pour les amoureux du ukulélé. Jouez, apprenez, partagez !</p>
-            <div class="flex space-x-4 text-lg">
-                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-github"></i></a>
-                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-twitter"></i></a>
-            </div>
+    <footer class="app-controls">
+      <div class="playback-bar">
+        <button id="play-btn" class="control-btn primary-btn">
+          <span class="btn-icon">▶</span> <span class="btn-text">Jouer la suite</span>
+        </button>
+        <div class="tempo-control">
+          <label for="tempo-range">Tempo: <span id="tempo-val">100</span> BPM</label>
+          <input type="range" id="tempo-range" min="60" max="180" value="100">
         </div>
+      </div>
+      <div class="info-bar">
+        <p class="tip-text">Tapez sur un accord pour l'écouter • Aucun défilement requis !</p>
+      </div>
     </footer>
-
-    <script src="app.js"></script>
+  </div>
+  <script src="app.js"></script>
 </body>
 </html>
