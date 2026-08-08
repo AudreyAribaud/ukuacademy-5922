@@ -2,124 +2,84 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UkuAcademy - Apprendre le Ukulélé</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>UkuLearn</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#e67e22">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪕</text></svg>">
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#6366f1">
 </head>
-<body>
+<body class="dark-theme">
   <header>
-    <div class="header-container">
-      <div class="logo">
-        <span class="logo-icon">🪕</span>
-        <h1>UkuAcademy</h1>
-      </div>
-      <nav>
-        <button class="nav-btn active" data-tab="progressions">Suites d'Accords</button>
-        <button class="nav-btn" data-tab="dictionary">Dictionnaire</button>
-        <button class="nav-btn" data-tab="metronome">Métronome</button>
-      </nav>
-      <button id="install-btn" class="install-btn" style="display: none;">Installer l'App</button>
+    <div class="logo">
+      <span class="icon">🎸</span>
+      <h1>UkuLearn</h1>
+    </div>
+    <div class="actions">
+      <button id="btn-install" class="btn-icon" style="display: none;" title="Installer l'application">📥</button>
+      <button id="btn-theme" class="btn-icon" title="Changer de thème">🌓</button>
     </div>
   </header>
 
-  <main class="container">
-    <!-- SECTION: PROGRESSIONS -->
-    <section id="tab-progressions" class="tab-content active">
-      <div class="section-header">
-        <h2>Suites d'Accords Magiques</h2>
-        <p>Ces accords se marient parfaitement pour créer de superbes mélodies. Choisissez une ambiance et jouez !</p>
+  <main>
+    <!-- TAB 1: ACCORDS -->
+    <section id="tab-chords" class="tab-content active">
+      <div class="chord-grid" id="chord-selector"></div>
+      <div class="chord-display">
+        <h2 id="chord-name">C</h2>
+        <div class="svg-container">
+          <svg id="chord-svg" viewBox="0 0 100 120" width="100%" height="100%"></svg>
+        </div>
+        <button id="btn-play-chord" class="btn-primary">Strummer 🔊</button>
       </div>
+    </section>
 
-      <div class="progression-selector">
-        <button class="prog-filter active" data-prog="pop">Pop Classique (Do / C)</button>
-        <button class="prog-filter" data-prog="island">Vibe des Îles (La min / Am)</button>
-        <button class="prog-filter" data-prog="jazz">Jazz Doux (Sol / G)</button>
-        <button class="prog-filter" data-prog="blues">Blues Traditionnel (Do / C)</button>
-      </div>
-
-      <div class="progression-display">
-        <div class="progression-info">
-          <h3 id="prog-title">Pop Classique</h3>
-          <p id="prog-desc">La progression la plus célèbre de la musique moderne. Facile et ultra-efficace !</p>
-          <div class="prog-controls">
-            <button id="play-prog-btn" class="btn btn-primary">▶ Jouer la Suite</button>
-            <button id="stop-prog-btn" class="btn btn-secondary" style="display:none;">⏹ Arrêter</button>
-            <div class="tempo-input-group">
-              <label for="prog-tempo">Tempo :</label>
-              <input type="number" id="prog-tempo" value="100" min="40" max="240"> BPM
-            </div>
+    <!-- TAB 2: SUITES D'ACCORDS -->
+    <section id="tab-progressions" class="tab-content">
+      <div class="progression-list" id="progression-list"></div>
+      <div class="progression-controls">
+        <div class="tempo-control">
+          <div class="tempo-label">
+            <span>Tempo</span>
+            <span id="tempo-val">100 BPM</span>
           </div>
+          <input type="range" id="tempo" min="60" max="180" value="100">
         </div>
-        <div class="chord-grid" id="progression-chords-container">
-          <!-- Dynamically filled -->
-        </div>
+        <button id="btn-play-prog" class="btn-primary">Jouer la Suite ▶️</button>
       </div>
     </section>
 
-    <!-- SECTION: DICTIONARY -->
-    <section id="tab-dictionary" class="tab-content">
-      <div class="section-header">
-        <h2>Dictionnaire d'Accords Interactif</h2>
-        <p>Cliquez sur un accord pour l'entendre sonner sur votre ukulélé virtuel.</p>
+    <!-- TAB 3: ACCORDEUR -->
+    <section id="tab-tuner" class="tab-content">
+      <div class="tuner-instruction">Tapez une corde pour entendre sa note de référence</div>
+      <div class="tuner-grid">
+        <button class="tuner-key" data-note="G"><strong>G</strong><span class="freq">392 Hz</span></button>
+        <button class="tuner-key" data-note="C"><strong>C</strong><span class="freq">261 Hz</span></button>
+        <button class="tuner-key" data-note="E"><strong>E</strong><span class="freq">329 Hz</span></button>
+        <button class="tuner-key" data-note="A"><strong>A</strong><span class="freq">440 Hz</span></button>
       </div>
-      <div class="chord-search-container">
-        <input type="text" id="chord-search" placeholder="Rechercher un accord (ex: C, Am, G...)">
-      </div>
-      <div class="chord-grid" id="dictionary-chords-container">
-        <!-- Dynamically filled -->
-      </div>
-    </section>
-
-    <!-- SECTION: METRONOME -->
-    <section id="tab-metronome" class="tab-content">
-      <div class="section-header">
-        <h2>Métronome Intégré</h2>
-        <p>Gardez le rythme parfait pour vos sessions d'entraînement.</p>
-      </div>
-
-      <div class="metronome-card">
-        <div class="visual-indicator" id="metronome-indicator">
-          <div class="beat-dot"></div>
-          <div class="beat-dot"></div>
-          <div class="beat-dot"></div>
-          <div class="beat-dot"></div>
-        </div>
-
-        <div class="tempo-display">
-          <span id="bpm-value">100</span>
-          <span class="bpm-unit">BPM</span>
-        </div>
-
-        <div class="tempo-slider-container">
-          <button class="tempo-btn" id="tempo-minus">-</button>
-          <input type="range" id="tempo-slider" min="40" max="220" value="100">
-          <button class="tempo-btn" id="tempo-plus">+</button>
-        </div>
-
-        <div class="metronome-controls">
-          <button id="metro-toggle" class="btn btn-large btn-primary">Démarrer</button>
-          <button id="tap-tempo-btn" class="btn btn-secondary">Tap Tempo</button>
-        </div>
-
-        <div class="sound-selector">
-          <label for="metro-sound">Son :</label>
-          <select id="metro-sound">
-            <option value="woodblock">Bloc de bois</option>
-            <option value="beep">Bip Électronique</option>
-            <option value="snap">Claquement de doigts</option>
-          </select>
-        </div>
+      <div class="tuner-visualizer">
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
       </div>
     </section>
   </main>
 
-  <footer>
-    <p>Fait avec ❤️ pour les amoureux du Ukulélé • UkuAcademy 2024</p>
-  </footer>
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="chords">
+      <span class="nav-icon">🎼</span>
+      <span class="nav-label">Accords</span>
+    </button>
+    <button class="nav-item" data-tab="progressions">
+      <span class="nav-icon">🔄</span>
+      <span class="nav-label">Suites</span>
+    </button>
+    <button class="nav-item" data-tab="tuner">
+      <span class="nav-icon">🔔</span>
+      <span class="nav-label">Accordeur</span>
+    </button>
+  </nav>
 
   <script src="app.js"></script>
 </body>
