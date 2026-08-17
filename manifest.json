@@ -1,20 +1,19 @@
 {
-  "name": "UkuAcademy - Apprendre le Ukulélé",
+  "name": "UkuAcademy",
   "short_name": "UkuAcademy",
-  "description": "Apprenez le ukulélé facilement avec des grilles d'accords, un accordeur et un métronome.",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#1e293b",
-  "orientation": "portrait",
+  "background_color": "#fdf6e2",
+  "theme_color": "#d97706",
+  "description": "Apprenez et jouez du ukulélé sans tourner en rond avec des partitions interactives, un accordeur et des défis amusants.",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%231e293b%22/><text y=%22.9em%22 x=%225%22 font-size=%2280%22>🪕</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎸</text></svg>",
       "sizes": "192x192",
       "type": "image/svg+xml"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%231e293b%22/><text y=%22.9em%22 x=%225%22 font-size=%2280%22>🪕</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎸</text></svg>",
       "sizes": "512x512",
       "type": "image/svg+xml"
     }

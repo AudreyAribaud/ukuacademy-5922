@@ -1,135 +1,224 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>UkuAcademy - Apprendre le Ukulélé</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1e293b">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪕</text></svg>">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UkuAcademy - Apprendre le Ukulélé</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#d97706">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎸</text></svg>">
 </head>
-<body class="dark-mode">
-  <header>
-    <div class="header-left">
-      <h1>🪕 UkuAcademy</h1>
-    </div>
-    <div class="header-right">
-      <button id="installBtn" class="btn-icon" title="Installer l'application" style="display: none;">📥</button>
-      <button id="themeToggle" class="btn-icon" title="Changer de thème">☀️</button>
-    </div>
-  </header>
-
-  <main>
-    <!-- SECTION 1: PROGRESSIONS -->
-    <section id="progressions-tab" class="tab-content active">
-      <div class="selector-container">
-        <label for="progressionSelect">Séquence d'accords :</label>
-        <select id="progressionSelect"></select>
-      </div>
-
-      <div class="progression-info">
-        <span id="progGenre" class="badge">Genre</span>
-        <span id="progDifficulty" class="badge">Difficulté</span>
-        <div class="rhythm-box">
-          <strong>Rythmique suggérée :</strong> <span id="progRhythm">D-DU-UDU</span>
+<body>
+    <header class="app-header">
+        <div class="logo-container">
+            <svg class="logo-icon" viewBox="0 0 64 64" width="40" height="40">
+                <path d="M12,48 C12,56 20,60 28,60 C36,60 44,56 44,48 C44,42 38,38 34,34 L34,12 C36,12 38,10 38,8 C38,5 34,4 32,4 C30,4 26,5 26,8 C26,10 28,12 30,12 L30,34 C26,38 12,42 12,48 Z" fill="#b45309"/>
+                <rect x="29" y="12" width="6" height="24" fill="#d97706"/>
+                <line x1="30" y1="12" x2="30" y2="36" stroke="#fef08a" stroke-width="1"/>
+                <line x1="32" y1="12" x2="32" y2="36" stroke="#fef08a" stroke-width="1"/>
+                <line x1="34" y1="12" x2="34" y2="36" stroke="#fef08a" stroke-width="1"/>
+                <circle cx="28" cy="48" r="5" fill="#78350f"/>
+            </svg>
+            <h1>UkuAcademy</h1>
         </div>
-      </div>
+        <nav class="main-nav">
+            <button class="nav-btn active" data-target="dashboard">🏠 Accueil</button>
+            <button class="nav-btn" data-target="songs">🎵 Partitions</button>
+            <button class="nav-btn" data-target="chords">🎸 Accords</button>
+            <button class="nav-btn" data-target="strumming">⏱️ Rythme</button>
+            <button class="nav-btn" data-target="tuner">🔧 Accordeur</button>
+            <button class="nav-btn" data-target="game">🎮 Défi</button>
+        </nav>
+    </header>
 
-      <div class="chords-display-container">
-        <div id="chordsGrid" class="chords-grid"></div>
-      </div>
+    <main class="app-content">
+        <!-- DASHBOARD VIEW -->
+        <section id="dashboard" class="view active">
+            <div class="hero-banner">
+                <h2>Prêt à faire vibrer vos cordes ? 🌴</h2>
+                <p>Apprenez le ukulélé à votre rythme avec nos outils interactifs, partitions simplifiées et mini-jeux.</p>
+                <button class="btn btn-primary" onclick="switchView('songs')">Voir les Partitions</button>
+            </div>
+            <div class="dashboard-grid">
+                <div class="card card-interactive" onclick="switchView('chords')">
+                    <h3>🎸 Dictionnaire d'Accords</h3>
+                    <p>Visualisez et écoutez les accords de base pour ukulélé.</p>
+                </div>
+                <div class="card card-interactive" onclick="switchView('strumming')">
+                    <h3>⏱️ Entraîneur de Rythmique</h3>
+                    <p>Maîtrisez le fameux "Island Strum" et d'autres rythmes essentiels.</p>
+                </div>
+                <div class="card card-interactive" onclick="switchView('tuner')">
+                    <h3>🔧 Accordeur de Poche</h3>
+                    <p>Accordez votre ukulélé facilement (G-C-E-A) grâce à notre générateur de notes.</p>
+                </div>
+                <div class="card card-interactive" onclick="switchView('game')">
+                    <h3>🎮 Le Grand Défi</h3>
+                    <p>Testez votre oreille et votre rapidité à reconnaître les accords !</p>
+                </div>
+            </div>
+        </section>
 
-      <div class="controls-row">
-        <button id="playProgressionBtn" class="btn btn-primary">▶ Écouter la Séquence</button>
-        <button id="strumProgressionBtn" class="btn btn-secondary">🎸 Gratter Tout</button>
-      </div>
-    </section>
+        <!-- SONGS VIEW -->
+        <section id="songs" class="view">
+            <div class="section-header">
+                <h2>🎵 Partitions de Chansons</h2>
+                <p>Des morceaux cultes simplifiés pour le ukulélé avec transposition interactive !</p>
+            </div>
+            <div class="song-layout">
+                <aside class="song-sidebar">
+                    <div class="search-box">
+                        <input type="text" id="song-search" placeholder="Rechercher une chanson..." oninput="filterSongs()">
+                    </div>
+                    <ul class="song-list" id="song-list-container"></ul>
+                </aside>
+                <article class="song-viewer">
+                    <div id="song-placeholder" class="song-placeholder">
+                        <p>Sélectionnez une chanson dans la liste pour commencer à jouer !</p>
+                    </div>
+                    <div id="song-content" class="song-content hidden">
+                        <div class="song-meta">
+                            <h3 id="song-title">Titre de la chanson</h3>
+                            <p id="song-artist">Artiste</p>
+                            <div class="song-controls">
+                                <button class="btn btn-sm" onclick="transposeSong(-1)">Transpose -1</button>
+                                <span id="transpose-val">Ton original</span>
+                                <button class="btn btn-sm" onclick="transposeSong(1)">Transpose +1</button>
+                                <button class="btn btn-sm btn-secondary" id="autoscroll-btn" onclick="toggleAutoscroll()">📜 Auto-défilement</button>
+                            </div>
+                        </div>
+                        <div class="song-chords-used">
+                            <h4>Accords requis :</h4>
+                            <div id="song-chords-list" class="chords-row"></div>
+                        </div>
+                        <pre id="song-lyrics-chords" class="lyrics-area"></pre>
+                    </div>
+                </article>
+            </div>
+        </section>
 
-    <!-- SECTION 2: ACCORDEUR -->
-    <section id="tuner-tab" class="tab-content">
-      <div class="tuner-container">
-        <h2>Accordeur Chromatique</h2>
-        <p class="subtitle">Jouez une corde ou utilisez les notes de référence ci-dessous.</p>
-        
-        <div class="tuner-visual">
-          <div class="tuner-gauge">
-            <div id="tunerNeedle" class="tuner-needle"></div>
-            <div class="tuner-center-mark"></div>
-          </div>
-          <div id="detectedNote" class="detected-note">-</div>
-          <div id="detuneAmount" class="detune-amount">En attente...</div>
-        </div>
+        <!-- CHORDS VIEW -->
+        <section id="chords" class="view">
+            <div class="section-header">
+                <h2>🎸 Bibliothèque d'Accords</h2>
+                <p>Cliquez sur un accord pour voir le diagramme et écouter sa sonorité.</p>
+            </div>
+            <div class="chords-container">
+                <div class="chords-selector" id="chords-selector-grid"></div>
+                <div class="chord-display-card">
+                    <h3 id="chord-display-name">Accord : C (Do)</h3>
+                    <div class="fretboard-container">
+                        <svg id="fretboard-svg" viewBox="0 0 160 220" width="100%" height="280">
+                            <!-- Strings -->
+                            <line x1="20" y1="20" x2="20" y2="200" stroke="#475569" stroke-width="2"/>
+                            <line x1="60" y1="20" x2="60" y2="200" stroke="#475569" stroke-width="2"/>
+                            <line x1="100" y1="20" x2="100" y2="200" stroke="#475569" stroke-width="2"/>
+                            <line x1="140" y1="20" x2="140" y2="200" stroke="#475569" stroke-width="2"/>
+                            <!-- Frets -->
+                            <line x1="20" y1="20" x2="140" y2="20" stroke="#1e293b" stroke-width="6"/> <!-- Nut -->
+                            <line x1="20" y1="65" x2="140" y2="65" stroke="#94a3b8" stroke-width="3"/>
+                            <line x1="20" y1="110" x2="140" y2="110" stroke="#94a3b8" stroke-width="3"/>
+                            <line x1="20" y1="155" x2="140" y2="155" stroke="#94a3b8" stroke-width="3"/>
+                            <line x1="20" y1="200" x2="140" y2="200" stroke="#94a3b8" stroke-width="3"/>
+                            <!-- Fret numbers -->
+                            <text x="5" y="45" font-size="12" fill="#64748b">1</text>
+                            <text x="5" y="90" font-size="12" fill="#64748b">2</text>
+                            <text x="5" y="135" font-size="12" fill="#64748b">3</text>
+                            <text x="5" y="180" font-size="12" fill="#64748b">4</text>
+                            <!-- String Labels -->
+                            <text x="18" y="215" font-size="12" font-weight="bold" fill="#0f172a">G</text>
+                            <text x="58" y="215" font-size="12" font-weight="bold" fill="#0f172a">C</text>
+                            <text x="98" y="215" font-size="12" font-weight="bold" fill="#0f172a">E</text>
+                            <text x="138" y="215" font-size="12" font-weight="bold" fill="#0f172a">A</text>
+                            <!-- Dynamic dots will be injected here -->
+                            <g id="fretboard-dots"></g>
+                        </svg>
+                    </div>
+                    <button class="btn btn-primary" id="play-chord-btn">🔊 Écouter l'accord</button>
+                </div>
+            </div>
+        </section>
 
-        <div class="reference-notes">
-          <button class="ref-note-btn" data-note="G">G (Sol)</button>
-          <button class="ref-note-btn" data-note="C">C (Do)</button>
-          <button class="ref-note-btn" data-note="E">E (Mi)</button>
-          <button class="ref-note-btn" data-note="A">A (La)</button>
-        </div>
+        <!-- STRUMMING VIEW -->
+        <section id="strumming" class="view">
+            <div class="section-header">
+                <h2>⏱️ Entraîneur de Rythmique</h2>
+                <p>Suivez le rythme visuel pour maîtriser les battements les plus populaires.</p>
+            </div>
+            <div class="strumming-container">
+                <div class="strumming-selector">
+                    <label for="pattern-select">Choisir un rythme :</label>
+                    <select id="pattern-select" onchange="loadStrummingPattern()">
+                        <option value="island">Island Strum (D - D U - U D U)</option>
+                        <option value="pop">Pop Standard (D - D U - D U)</option>
+                        <option value="reggae">Reggae Offbeat ( - D - D - D - D)</option>
+                        <option value="waltz">Valse 3/4 (D - U U)</option>
+                    </select>
+                </div>
+                <div class="metronome-controls">
+                    <div class="tempo-slider-container">
+                        <label for="tempo-slider">Tempo: <span id="tempo-val">100</span> BPM</label>
+                        <input type="range" id="tempo-slider" min="60" max="180" value="100" oninput="updateTempo(this.value)">
+                    </div>
+                    <button class="btn btn-primary" id="start-strum-btn" onclick="toggleStrumming()">▶️ Démarrer</button>
+                </div>
+                <div class="visual-strum-bar" id="visual-strum-bar"></div>
+                <div class="strum-instructions">
+                    <p><strong>Légende :</strong> <span class="badge badge-down">D</span> = Bas (Down), <span class="badge badge-up">U</span> = Haut (Up), <span class="badge badge-mute">-</span> = Pause/Silence</p>
+                </div>
+            </div>
+        </section>
 
-        <button id="micToggleBtn" class="btn btn-primary">🎤 Activer le Micro</button>
-      </div>
-    </section>
+        <!-- TUNER VIEW -->
+        <section id="tuner" class="view">
+            <div class="section-header">
+                <h2>🔧 Accordeur de Poche (G-C-E-A)</h2>
+                <p>Cliquez sur une corde pour entendre la note de référence et accorder votre ukulélé à l'oreille.</p>
+            </div>
+            <div class="tuner-container">
+                <div class="tuner-headstock">
+                    <div class="peg peg-left-top" onclick="playTunerNote('G', 392.00)"><span>G</span><small>Sol</small></div>
+                    <div class="peg peg-left-bottom" onclick="playTunerNote('C', 261.63)"><span>C</span><small>Do</small></div>
+                    <div class="peg peg-right-bottom" onclick="playTunerNote('E', 329.63)"><span>E</span><small>Mi</small></div>
+                    <div class="peg peg-right-top" onclick="playTunerNote('A', 440.00)"><span>A</span><small>La</small></div>
+                    <div class="headstock-wood">
+                        <div class="headstock-logo">🎸</div>
+                    </div>
+                </div>
+                <div class="tuner-status">
+                    <p id="tuner-note-display">Cliquez sur une clé pour jouer</p>
+                </div>
+            </div>
+        </section>
 
-    <!-- SECTION 3: METRONOME -->
-    <section id="metronome-tab" class="tab-content">
-      <div class="metronome-container">
-        <h2>Métronome</h2>
-        <div class="metro-display">
-          <div id="metroVisual" class="metro-visual-dot"></div>
-          <div id="bpmDisplay" class="bpm-display">120 <span class="bpm-unit">BPM</span></div>
-        </div>
+        <!-- GAME VIEW -->
+        <section id="game" class="view">
+            <div class="section-header">
+                <h2>🎮 Défi d'Accords</h2>
+                <p>Écoutez l'accord joué et devinez de quel accord il s'agit !</p>
+            </div>
+            <div class="game-container">
+                <div class="game-score-board">
+                    <span>Score : <strong id="game-score">0</strong></span>
+                    <span>Meilleur Score : <strong id="game-highscore">0</strong></span>
+                </div>
+                <div class="game-card">
+                    <div class="game-audio-trigger">
+                        <button class="btn btn-primary btn-lg" onclick="playGameTargetChord()">🔊 Écouter l'accord mystère</button>
+                    </div>
+                    <div class="game-options" id="game-options-container"></div>
+                    <div class="game-feedback" id="game-feedback"></div>
+                </div>
+                <button class="btn btn-secondary" onclick="resetGame()">Réinitialiser le jeu</button>
+            </div>
+        </</section>
+    </main>
 
-        <div class="metro-controls">
-          <input type="range" id="bpmSlider" min="40" max="240" value="120">
-          <div class="bpm-buttons">
-            <button id="bpmMinus" class="btn btn-small">-</button>
-            <button id="bpmPlus" class="btn btn-small">+</button>
-          </div>
-        </div>
+    <footer class="app-footer">
+        <p>&copy; 2024 UkuAcademy - Conçu pour les amoureux du ukulélé 🌴🎸</p>
+    </footer>
 
-        <div class="time-signature-container">
-          <button class="sig-btn active" data-sig="4">4/4</button>
-          <button class="sig-btn" data-sig="3">3/4</button>
-          <button class="sig-btn" data-sig="2">2/4</button>
-        </div>
-
-        <button id="metroPlayBtn" class="btn btn-primary btn-large">Démarrer</button>
-      </div>
-    </section>
-
-    <!-- SECTION 4: DICTIONNAIRE -->
-    <section id="library-tab" class="tab-content">
-      <div class="library-container">
-        <h2>Dictionnaire d'Accords</h2>
-        <div class="search-box">
-          <input type="text" id="chordSearch" placeholder="Rechercher un accord (ex: C, Am, G7...)">
-        </div>
-        <div id="libraryGrid" class="chords-grid library-grid"></div>
-      </div>
-    </section>
-  </main>
-
-  <nav class="bottom-nav">
-    <button class="nav-item active" data-tab="progressions-tab">
-      <span class="nav-icon">🎵</span>
-      <span class="nav-label">Suites</span>
-    </button>
-    <button class="nav-item" data-tab="tuner-tab">
-      <span class="nav-icon">🎸</span>
-      <span class="nav-label">Accordeur</span>
-    </button>
-    <button class="nav-item" data-tab="metronome-tab">
-      <span class="nav-icon">⏱️</span>
-      <span class="nav-label">Métronome</span>
-    </button>
-    <button class="nav-item" data-tab="library-tab">
-      <span class="nav-icon">📖</span>
-      <span class="nav-label">Dico</span>
-    </button>
-  </nav>
-
-  <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
