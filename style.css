@@ -1,51 +1,468 @@
-/* Custom styles for UkuAcademy */
+:root {
+  --primary: #e67e22;
+  --primary-dark: #d35400;
+  --secondary: #2ecc71;
+  --bg-color: #fdfaf6;
+  --card-bg: #ffffff;
+  --text-color: #2c3e50;
+  --text-light: #7f8c8d;
+  --border-color: #f1f1f1;
+  --shadow: 0 8px 24px rgba(0,0,0,0.06);
+  --radius: 16px;
+  --font-title: 'Fredoka One', cursive;
+  --font-body: 'Quicksand', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  background-color: #fcfaf1;
-  -webkit-tap-highlight-color: transparent;
+  font-family: var(--font-body);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  padding-bottom: 60px;
 }
 
-/* Navigation active state */
-.nav-btn.active {
-  color: #e36414 !important;
+header {
+  text-align: center;
+  padding: 30px 20px 20px;
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  color: white;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+}
+
+header h1 {
+  font-family: var(--font-title);
+  font-size: 2.5rem;
+  letter-spacing: 1px;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-top: 5px;
+}
+
+/* Navigation Tab Bar */
+.tab-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px auto;
+  max-width: 800px;
+  padding: 0 15px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.tab-btn.active, .tab-btn:hover {
+  background-color: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Main Content */
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 15px 40px;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h2 {
+  font-family: var(--font-title);
+  color: var(--primary-dark);
+  margin-bottom: 10px;
+  font-size: 1.8rem;
+}
+
+.section-desc {
+  color: var(--text-light);
+  margin-bottom: 25px;
+  font-size: 1rem;
+}
+
+/* Chords Grid */
+.chord-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 15px;
+}
+
+.chord-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 15px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid transparent;
+}
+
+.chord-card:hover {
   transform: scale(1.05);
+  border-color: var(--primary);
 }
 
-/* Tuner needle smooth transition */
-#tuner-needle {
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+.chord-card h3 {
+  font-family: var(--font-title);
+  font-size: 1.4rem;
+  color: var(--primary);
+  margin-bottom: 10px;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #fcfaf1;
-}
-::-webkit-scrollbar-thumb {
-  background: #0f4c5c30;
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #0f4c5c50;
+.chord-diagram {
+  width: 80px;
+  height: 100px;
+  margin: 0 auto;
 }
 
-/* Chord diagram styling */
-.chord-svg {
-  filter: drop-shadow(0 2px 4px rgba(15, 76, 92, 0.08));
+/* Progressions & Strums Lists */
+.progression-list, .strum-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-/* Animations */
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(227, 100, 20, 0.4);
+.prog-card, .strum-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.card-title {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  color: var(--primary-dark);
+}
+
+.card-badge {
+  background-color: #f39c12;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.prog-chords-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.prog-chord-bubble {
+  background: #fdf2e9;
+  border: 2px solid var(--primary);
+  color: var(--primary-dark);
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(230, 126, 34, 0.15);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.prog-chord-bubble:active {
+  transform: scale(0.9);
+}
+
+.prog-arrow {
+  color: var(--text-light);
+  font-weight: bold;
+}
+
+.strum-pattern-display {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.strum-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 55px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: 2px solid transparent;
+}
+
+.strum-arrow.down {
+  color: #e74c3c;
+  border-color: rgba(231, 76, 60, 0.2);
+}
+
+.strum-arrow.up {
+  color: #3498db;
+  border-color: rgba(52, 152, 219, 0.2);
+}
+
+.strum-arrow.mute {
+  color: #95a5a6;
+  background: #e0e0e0;
+}
+
+.strum-arrow-sub {
+  font-size: 0.7rem;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+/* Practice Tab */
+.practice-setup {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.setup-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.setup-group label {
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.setup-group select, .setup-group input[type="range"] {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+}
+
+.player-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 25px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.metronome-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.beat-dot {
+  width: 16px;
+  height: 16px;
+  background-color: #e0e0e0;
+  border-radius: 50%;
+  transition: background-color 0.1s, transform 0.1s;
+}
+
+.beat-dot.active {
+  background-color: var(--secondary);
+  transform: scale(1.3);
+}
+
+.practice-display {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 25px;
+  gap: 15px;
+}
+
+.chord-display-box {
+  flex: 1;
+  background: #fafafa;
+  border-radius: var(--radius);
+  padding: 15px;
+  border: 2px solid var(--border-color);
+  max-width: 200px;
+}
+
+.chord-display-box.current {
+  border-color: var(--primary);
+  background: #fffdfa;
+}
+
+.chord-display-box .label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--text-light);
+  display: block;
+  margin-bottom: 5px;
+}
+
+.chord-display-box .chord-name {
+  font-family: var(--font-title);
+  font-size: 2.2rem;
+  color: var(--primary-dark);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.chord-diagram-mini {
+  width: 60px;
+  height: 75px;
+  margin: 0 auto;
+}
+
+.strum-visualizer {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 25px;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.strum-visualizer .strum-arrow.active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary-dark);
+  transform: scale(1.15);
+  box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3);
+}
+
+.player-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn {
+  padding: 12px 28px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: var(--secondary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #27ae60;
+}
+
+.btn-secondary {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #c0392b;
+}
+
+.btn:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+footer {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 2rem;
   }
-  50% {
-    box-shadow: 0 0 0 10px rgba(227, 100, 20, 0);
+  .tab-bar {
+    gap: 5px;
   }
-}
-
-.mic-active {
-  animation: pulse-glow 2s infinite;
-  background-color: #10b981 !important; /* Emerald green when active */
+  .tab-btn {
+    font-size: 0.8rem;
+    padding: 10px 5px;
+  }
+  .practice-display {
+    flex-direction: column;
+    align-items: center;
+  }
+  .chord-display-box {
+    width: 100%;
+    max-width: 280px;
+  }
 }

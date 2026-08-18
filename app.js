@@ -1,464 +1,468 @@
-// UkuAcademy - Application Logic
-
-// Audio Context & Synthesizer Setup
-let audioCtx = null;
-let micStream = null;
-let analyser = null;
-let sourceNode = null;
-let isMicTuning = false;
-let animationFrameId = null;
-
-// Ukulele Standard Tuning Target Frequencies
-const UKE_STRINGS = [
-  { note: 'G', freq: 392.00, label: 'Sol (Corde 4)' },
-  { note: 'C', freq: 261.63, label: 'Do (Corde 3)' },
-  { note: 'E', freq: 329.63, label: 'Mi (Corde 2)' },
-  { note: 'A', freq: 440.00, label: 'La (Corde 1)' }
-];
-
-// Chord Dictionary Data
+// --- DATABASE & CONFIGURATION ---
 const CHORDS = {
-  'C': { name: 'Do Majeur', frets: [0, 0, 0, 3], midi: [67, 60, 64, 72] },
-  'G': { name: 'Sol Majeur', frets: [0, 2, 3, 2], midi: [67, 62, 67, 71] },
-  'Am': { name: 'La Mineur', frets: [2, 0, 0, 0], midi: [69, 60, 64, 69] },
-  'F': { name: 'Fa Majeur', frets: [2, 0, 1, 0], midi: [69, 60, 65, 69] },
-  'Dm': { name: 'Ré Mineur', frets: [2, 2, 1, 0], midi: [69, 62, 65, 69] },
-  'G7': { name: 'Sol Septième', frets: [0, 2, 1, 2], midi: [67, 62, 65, 71] },
-  'C7': { name: 'Do Septième', frets: [0, 0, 0, 1], midi: [67, 60, 64, 70] },
-  'Em': { name: 'Mi Mineur', frets: [0, 4, 3, 2], midi: [67, 64, 67, 71] }
+  'C':  { frets: [0, 0, 0, 3], fingers: [0, 0, 0, 3] },
+  'G':  { frets: [0, 2, 3, 2], fingers: [0, 1, 3, 2] },
+  'Am': { frets: [2, 0, 0, 0], fingers: [2, 0, 0, 0] },
+  'F':  { frets: [2, 0, 1, 0], fingers: [2, 0, 1, 0] },
+  'D':  { frets: [2, 2, 2, 0], fingers: [1, 2, 3, 0] },
+  'Dm': { frets: [2, 2, 1, 0], fingers: [2, 3, 1, 0] },
+  'Em': { frets: [0, 4, 3, 2], fingers: [0, 3, 2, 1] },
+  'A':  { frets: [2, 1, 0, 0], fingers: [2, 1, 0, 0] },
+  'Bb': { frets: [3, 2, 1, 1], fingers: [3, 2, 1, 1] },
+  'E7': { frets: [1, 2, 0, 2], fingers: [1, 2, 0, 3] }
 };
 
-// Chord Progressions Data
 const PROGRESSIONS = [
   {
-    title: "L'Incontournable Pop",
-    description: "La suite d'accords la plus célèbre au monde. Joyeuse, entraînante et parfaite pour débuter.",
+    id: 'pop-classic',
+    name: 'Pop Classique (I-V-vi-IV)',
     chords: ['C', 'G', 'Am', 'F'],
-    difficulty: "Facile",
-    tempo: 100
+    difficulty: 'Débutant'
   },
   {
-    title: "La Ballade Douce (50s)",
-    description: "Une ambiance rétro et nostalgique, idéale pour chanter des mélodies romantiques.",
+    id: 'stand-by-me',
+    name: 'Stand By Me (I-vi-IV-V)',
     chords: ['C', 'Am', 'F', 'G'],
-    difficulty: "Facile",
-    tempo: 90
+    difficulty: 'Débutant'
   },
   {
-    title: "L'Ambiance Épique",
-    description: "Une progression mineure puissante qui apporte de l'émotion et de la profondeur à votre jeu.",
+    id: 'folk-ballad',
+    name: 'Folk Mélancolique',
     chords: ['Am', 'F', 'C', 'G'],
-    difficulty: "Intermédiaire",
-    tempo: 110
+    difficulty: 'Intermédiaire'
   },
   {
-    title: "Le Reggae Chill",
-    description: "Sentez la brise des îles avec ce rythme ensoleillé et décontracté.",
+    id: 'jazz-turnaround',
+    name: 'Jazz Turnaround (ii-V-I)',
+    chords: ['Dm', 'G', 'C', 'A'],
+    difficulty: 'Avancé'
+  },
+  {
+    id: 'island-breeze',
+    name: 'Brise des Îles',
     chords: ['C', 'F', 'G', 'F'],
-    difficulty: "Facile",
-    tempo: 85
+    difficulty: 'Débutant'
   },
   {
-    title: "Le Folk Mélancolique",
-    description: "Un enchaînement doux et introspectif qui met en valeur la résonance du ukulélé.",
-    chords: ['Em', 'C', 'G', 'D7'],
-    difficulty: "Avancé",
-    // Custom chord definition inline for D7 if needed, but we can map it
-    customChords: {
-      'D7': { name: 'Ré Septième', frets: [2, 0, 2, 0], midi: [69, 60, 66, 69] }
-    }
+    id: 'andalusian-cadence',
+    name: 'Cadence Andalouse',
+    chords: ['Am', 'G', 'F', 'E7'],
+    difficulty: 'Intermédiaire'
   }
 ];
 
-// Initialize App
-document.addEventListener('DOMContentLoaded', () => {
-  initNavigation();
-  renderChordDictionary();
-  renderProgressions();
-  setupMicTuner();
-  registerServiceWorker();
-});
-
-// Navigation Logic
-function switchView(viewId) {
-  document.querySelectorAll('.view-section').forEach(section => {
-    section.classList.add('hidden');
-  });
-  document.getElementById(`view-${viewId}`).classList.remove('hidden');
-
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.remove('active');
-    btn.classList.add('text-slate-400');
-  });
-  document.getElementById(`nav-${viewId}`).classList.add('active');
-  document.getElementById(`nav-${viewId}`).classList.remove('text-slate-400');
-
-  // Stop mic if leaving tuner view
-  if (viewId !== 'tuner' && isMicTuning) {
-    stopMicTuning();
+const STRUMS = [
+  {
+    id: 'island-strum',
+    name: 'Island Strum (Le Classique)',
+    pattern: ['B', '_', 'B', 'H', '_', 'H', 'B', 'H'], // Down, -, Down, Up, -, Up, Down, Up
+    description: 'Le rythme le plus célèbre et polyvalent pour le ukulélé.'
+  },
+  {
+    id: 'simple-down',
+    name: 'Feu de Camp (4 Bas)',
+    pattern: ['B', '_', 'B', '_', 'B', '_', 'B', '_'],
+    description: 'Idéal pour débuter et se concentrer sur les changements d\'accords.'
+  },
+  {
+    id: 'pop-rock',
+    name: 'Pop Rock Dynamique',
+    pattern: ['B', '_', 'B', 'H', 'B', 'H', 'B', 'H'],
+    description: 'Un rythme rapide et entraînant pour les morceaux modernes.'
+  },
+  {
+    id: 'reggae-offbeat',
+    name: 'Reggae (Contretemps)',
+    pattern: ['_', 'B', '_', 'B', '_', 'B', '_', 'B'],
+    description: 'Accentuez le contretemps pour donner un style ensoleillé.'
+  },
+  {
+    id: 'waltz-34',
+    name: 'Valse (3/4)',
+    pattern: ['B', '_', 'B', 'H', 'B', 'H'],
+    description: 'Rythmique ternaire classique à 3 temps.'
   }
-}
+];
 
-function initNavigation() {
-  // Set initial active nav
-  document.getElementById('nav-tuner').classList.add('active');
-}
+// --- AUDIO SYNTHESIS (Web Audio API) ---
+let audioCtx = null;
 
-// Audio Context Lazy Initializer
-function getAudioContext() {
+function initAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
+}
+
+// Ukulele standard tuning frequencies (G4, C4, E4, A4)
+const STRING_FREQS = [392.00, 261.63, 329.63, 440.00];
+
+function playChord(chordName, duration = 0.8, strumSpeed = 0.03) {
+  initAudio();
   if (audioCtx.state === 'suspended') {
     audioCtx.resume();
   }
-  return audioCtx;
-}
 
-// Play Reference Note (Tuner)
-function playReferenceNote(noteName, frequency) {
-  const ctx = getAudioContext();
-  
-  // Visual feedback on button
-  const buttons = document.querySelectorAll('.ref-note-btn');
-  buttons.forEach(btn => {
-    if (btn.querySelector('span').innerText === noteName) {
-      btn.classList.add('bg-orange-100', 'border-orange-300');
-      setTimeout(() => btn.classList.remove('bg-orange-100', 'border-orange-300'), 500);
-    }
-  });
+  const chord = CHORDS[chordName];
+  if (!chord) return;
 
-  // Synthesize Ukulele Pluck
-  const osc = ctx.createOscillator();
-  const gainNode = ctx.createGain();
-  
-  osc.type = 'triangle';
-  osc.frequency.setValueAtTime(frequency, ctx.currentTime);
-  
-  // Envelope
-  gainNode.gain.setValueAtTime(0.8, ctx.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
-  
-  osc.connect(gainNode);
-  gainNode.connect(ctx.destination);
-  
-  osc.start();
-  osc.stop(ctx.currentTime + 1.5);
-}
+  const now = audioCtx.currentTime;
 
-// Microphone Tuner Logic
-function setupMicTuner() {
-  const btnMic = document.getElementById('btn-mic-toggle');
-  btnMic.addEventListener('click', async () => {
-    if (isMicTuning) {
-      stopMicTuning();
-    } else {
-      await startMicTuning();
-    }
+  // Play each of the 4 strings with a slight delay to simulate strumming
+  chord.frets.forEach((fret, stringIdx) => {
+    const baseFreq = STRING_FREQS[stringIdx];
+    // Calculate frequency based on fret
+    const freq = baseFreq * Math.pow(2, fret / 12);
+
+    // Create oscillator and gain node
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    osc.type = 'triangle'; // Warm, wood-like tone
+    osc.frequency.value = freq;
+
+    // Envelope
+    const strumDelay = stringIdx * strumSpeed;
+    const startTime = now + strumDelay;
+    
+    gainNode.gain.setValueAtTime(0, startTime);
+    gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    osc.start(startTime);
+    osc.stop(startTime + duration);
   });
 }
 
-async function startMicTuning() {
-  const btnMic = document.getElementById('btn-mic-toggle');
-  try {
-    const ctx = getAudioContext();
-    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    
-    analyser = ctx.createAnalyser();
-    analyser.fftSize = 2048;
-    
-    sourceNode = ctx.createMediaStreamSource(micStream);
-    sourceNode.connect(analyser);
-    
-    isMicTuning = true;
-    btnMic.classList.add('mic-active');
-    btnMic.querySelector('span').innerText = "Désactiver le micro";
-    btnMic.querySelector('i').classList.remove('animate-pulse');
-    
-    updateTunerLoop();
-  } catch (err) {
-    console.error("Accès micro refusé ou non supporté:", err);
-    alert("Impossible d'accéder au micro. Veuillez autoriser l'accès pour utiliser l'accordeur.");
-  }
-}
+// --- SVG DIAGRAM GENERATOR ---
+function createChordSVG(chordName, size = 100) {
+  const chord = CHORDS[chordName];
+  if (!chord) return '';
 
-function stopMicTuning() {
-  const btnMic = document.getElementById('btn-mic-toggle');
-  isMicTuning = false;
-  if (micStream) {
-    micStream.getTracks().forEach(track => track.stop());
-  }
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId);
-  }
-  btnMic.classList.remove('mic-active');
-  btnMic.querySelector('span').innerText = "Activer l'accordage micro";
-  
-  // Reset UI
-  document.getElementById('tuner-needle').style.transform = 'translateY(-50%) rotate(0deg)';
-  document.getElementById('detected-note').innerText = '--';
-  document.getElementById('detected-freq').innerText = '0.0 Hz';
-  document.getElementById('tuning-hint').innerText = 'Activez le micro';
-  document.getElementById('tune-glow').style.opacity = '0';
-}
-
-function updateTunerLoop() {
-  if (!isMicTuning) return;
-  
-  const bufferLength = analyser.fftSize;
-  const buffer = new Float32Array(bufferLength);
-  analyser.getFloatTimeDomainData(buffer);
-  
-  const sampleRate = audioCtx.sampleRate;
-  const frequency = autoCorrelate(buffer, sampleRate);
-  
-  if (frequency !== -1 && frequency > 150 && frequency < 600) {
-    // Find closest ukulele string
-    let closestString = UKE_STRINGS[0];
-    let minDiff = Math.abs(frequency - UKE_STRINGS[0].freq);
-    
-    for (let i = 1; i < UKE_STRINGS.length; i++) {
-      const diff = Math.abs(frequency - UKE_STRINGS[i].freq);
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestString = UKE_STRINGS[i];
-      }
-    }
-    
-    // Calculate deviation in cents
-    // cents = 1200 * log2(f2 / f1)
-    const cents = 1200 * Math.log2(frequency / closestString.freq);
-    
-    // Update UI
-    document.getElementById('detected-note').innerText = closestString.note;
-    document.getElementById('detected-freq').innerText = `${frequency.toFixed(1)} Hz`;
-    
-    // Rotate needle (-45deg to +45deg based on -50 to +50 cents)
-    const angle = Math.max(-45, Math.min(45, cents));
-    document.getElementById('tuner-needle').style.transform = `translateY(-50%) rotate(${angle}deg)`;
-    
-    // Tuning helper text
-    const hintEl = document.getElementById('tuning-hint');
-    const glowEl = document.getElementById('tune-glow');
-    
-    if (Math.abs(cents) < 3) {
-      hintEl.innerText = "Parfait !";
-      hintEl.className = "text-sm font-bold text-emerald-500 mt-2";
-      glowEl.style.opacity = '1';
-    } else if (cents < 0) {
-      hintEl.innerText = "Trop bas (tendez la corde)";
-      hintEl.className = "text-sm font-semibold text-amber-500 mt-2";
-      glowEl.style.opacity = '0';
-    } else {
-      hintEl.innerText = "Trop haut (détendez la corde)";
-      hintEl.className = "text-sm font-semibold text-amber-500 mt-2";
-      glowEl.style.opacity = '0';
-    }
-  }
-  
-  animationFrameId = requestAnimationFrame(updateTunerLoop);
-}
-
-// Autocorrelation Pitch Detection Algorithm
-function autoCorrelate(buffer, sampleRate) {
-  const SIZE = buffer.length;
-  let rms = 0;
-  
-  for (let i = 0; i < SIZE; i++) {
-    const val = buffer[i];
-    rms += val * val;
-  }
-  rms = Math.sqrt(rms / SIZE);
-  if (rms < 0.01) return -1; // Not enough signal
-  
-  let r1 = 0, r2 = SIZE - 1, thres = 0.2;
-  for (let i = 0; i < SIZE / 2; i++) {
-    if (Math.abs(buffer[i]) < thres) { r1 = i; break; }
-  }
-  for (let i = SIZE - 1; i >= SIZE / 2; i--) {
-    if (Math.abs(buffer[i]) < thres) { r2 = i; break; }
-  }
-  
-  const slicedBuffer = buffer.slice(r1, r2);
-  const slicedSize = slicedBuffer.length;
-  
-  const c = new Float32Array(slicedSize);
-  for (let i = 0; i < slicedSize; i++) {
-    for (let j = 0; j < slicedSize - i; j++) {
-      c[i] = c[i] + slicedBuffer[j] * slicedBuffer[j + i];
-    }
-  }
-  
-  let d = 0;
-  while (c[d] > c[d + 1]) d++;
-  
-  let maxval = -1, maxpos = -1;
-  for (let i = d; i < slicedSize; i++) {
-    if (c[i] > maxval) {
-      maxval = c[i];
-      maxpos = i;
-    }
-  }
-  
-  let T0 = maxpos;
-  const x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
-  const a = (x1 + x3 - 2 * x2) / 2;
-  const b = (x3 - x1) / 2;
-  if (a) T0 = T0 - b / (2 * a);
-  
-  return sampleRate / T0;
-}
-
-// Render Chord SVG Diagram
-function generateChordSVG(frets) {
   const width = 80;
   const height = 100;
-  const stringsCount = 4;
-  const fretsCount = 4;
+  const numStrings = 4;
+  const numFrets = 4;
+
+  // Grid coordinates
+  const xStep = width / (numStrings - 1);
+  const yStep = height / numFrets;
+  const paddingX = 10;
+  const paddingY = 15;
+
+  let svg = `<svg width="${size}" height="${size * 1.25}" viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg">`;
   
-  let svg = `<svg class="chord-svg mx-auto" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
-  
-  // Draw Fretboard Grid
-  // Strings (vertical lines)
-  for (let i = 0; i < stringsCount; i++) {
-    const x = 10 + i * 20;
-    svg += `<line x1="${x}" y1="20" x2="${x}" y2="90" stroke="#cbd5e1" stroke-width="1.5"/>`;
+  // Draw Nut (top thick line)
+  svg += `<line x1="${paddingX}" y1="${paddingY}" x2="${paddingX + width}" y2="${paddingY}" stroke="#2c3e50" stroke-width="4" />`;
+
+  // Draw Frets
+  for (let i = 1; i <= numFrets; i++) {
+    const y = paddingY + i * yStep;
+    svg += `<line x1="${paddingX}" y1="${y}" x2="${paddingX + width}" y2="${y}" stroke="#bdc3c7" stroke-width="2" />`;
   }
-  
-  // Frets (horizontal lines)
-  for (let i = 0; i <= fretsCount; i++) {
-    const y = 20 + i * 17.5;
-    const widthStr = i === 0 ? "3" : "1";
-    const colorStr = i === 0 ? "#0f4c5c" : "#cbd5e1";
-    svg += `<line x1="10" y1="${y}" x2="70" y2="${y}" stroke="${colorStr}" stroke-width="${widthStr}"/>`;
+
+  // Draw Strings
+  for (let i = 0; i < numStrings; i++) {
+    const x = paddingX + i * xStep;
+    svg += `<line x1="${x}" y1="${paddingY}" x2="${x}" y2="${paddingY + height}" stroke="#7f8c8d" stroke-width="2" />`;
   }
-  
-  // Draw Dots for Fretted Notes
-  frets.forEach((fret, stringIdx) => {
-    const x = 10 + stringIdx * 20;
-    if (fret === 0) {
-      // Open string circle at top
-      svg += `<circle cx="${x}" cy="12" r="3" fill="none" stroke="#0f4c5c" stroke-width="1.5"/>`;
-    } else if (fret > 0) {
-      // Fretted note dot
-      const y = 20 + (fret - 0.5) * 17.5;
-      svg += `<circle cx="${x}" cy="${y}" r="5" fill="#e36414"/>`;
+
+  // Draw Fingers / Dots
+  chord.frets.forEach((fret, stringIdx) => {
+    if (fret > 0) {
+      const cx = paddingX + stringIdx * xStep;
+      const cy = paddingY + (fret - 0.5) * yStep;
+      const finger = chord.fingers[stringIdx];
+
+      // Dot
+      svg += `<circle cx="${cx}" cy="${cy}" r="7" fill="#e67e22" />`;
+      // Finger number
+      if (finger > 0) {
+        svg += `<text x="${cx}" y="${cy + 4}" font-family="sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">${finger}</text>`;
+      }
+    } else if (fret === 0) {
+      // Open string indicator
+      const cx = paddingX + stringIdx * xStep;
+      svg += `<circle cx="${cx}" cy="${paddingY - 6}" r="3" fill="none" stroke="#2ecc71" stroke-width="2" />`;
     }
   });
-  
-  svg += `</svg>`;
+
+  svg += '</svg>';
   return svg;
 }
 
-// Render Chord Dictionary
-function renderChordDictionary() {
-  const grid = document.getElementById('chord-dictionary-grid');
+// --- UI RENDERING ---
+function renderChords() {
+  const grid = document.getElementById('chordGrid');
   grid.innerHTML = '';
-  
-  Object.keys(CHORDS).forEach(chordKey => {
-    const chord = CHORDS[chordKey];
+  Object.keys(CHORDS).forEach(chordName => {
     const card = document.createElement('div');
-    card.className = "bg-slate-50 hover:bg-orange-50/30 border border-slate-100 hover:border-orange-200 rounded-2xl p-4 text-center cursor-pointer transition-all transform hover:-translate-y-1 active:scale-95";
-    card.onclick = () => playChord(chord.midi);
-    
+    card.className = 'chord-card';
     card.innerHTML = `
-      <h3 class="font-bold text-lg text-[#0f4c5c] mb-2">${chordKey}</h3>
-      <div class="mb-3">${generateChordSVG(chord.frets)}</div>
-      <p class="text-xs text-slate-400">${chord.name}</p>
+      <h3>${chordName}</h3>
+      <div class="chord-diagram">${createChordSVG(chordName, 80)}</div>
     `;
+    card.addEventListener('click', () => playChord(chordName));
     grid.appendChild(card);
   });
 }
 
-// Play Chord (Strumming Effect)
-function playChord(midiNotes, delayOffset = 0) {
-  const ctx = getAudioContext();
-  const now = ctx.currentTime + delayOffset;
-  
-  midiNotes.forEach((midi, index) => {
-    const freq = Math.pow(2, (midi - 69) / 12) * 440;
-    const osc = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq, now + index * 0.03); // Strum delay
-    
-    gainNode.gain.setValueAtTime(0.4, now + index * 0.03);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, now + index * 0.03 + 1.2);
-    
-    osc.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    
-    osc.start(now + index * 0.03);
-    osc.stop(now + index * 0.03 + 1.2);
-  });
-}
-
-// Render Chord Progressions
 function renderProgressions() {
-  const container = document.getElementById('progressions-container');
-  container.innerHTML = '';
-  
-  PROGRESSIONS.forEach((prog, idx) => {
+  const list = document.getElementById('progressionList');
+  list.innerHTML = '';
+  PROGRESSIONS.forEach(prog => {
     const card = document.createElement('div');
-    card.className = "bg-slate-50 rounded-2xl p-5 border border-slate-100 hover:border-orange-100 transition-all";
+    card.className = 'prog-card';
     
-    // Generate Chord Diagrams HTML for this progression
-    let diagramsHTML = '';
-    prog.chords.forEach(chordKey => {
-      const chord = CHORDS[chordKey] || (prog.customChords && prog.customChords[chordKey]);
-      if (chord) {
-        diagramsHTML += `
-          <div class="text-center bg-white p-2.5 rounded-xl border border-slate-100 shadow-sm">
-            <span class="font-bold text-sm text-[#0f4c5c] block mb-1">${chordKey}</span>
-            ${generateChordSVG(chord.frets)}
-          </div>
-        `;
+    let chordsHtml = '';
+    prog.chords.forEach((chord, idx) => {
+      chordsHtml += `<div class="prog-chord-bubble" onclick="playChord('${chord}')">${chord}</div>`;
+      if (idx < prog.chords.length - 1) {
+        chordsHtml += `<span class="prog-arrow">➔</span>`;
       }
     });
-    
+
     card.innerHTML = `
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-        <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-orange-100 text-[#e36414]">${prog.difficulty}</span>
-            <span class="text-xs text-slate-400"><i class="fa-solid fa-gauge-high mr-1"></i> ${prog.tempo || 90} BPM</span>
-          </div>
-          <h3 class="font-bold text-lg text-[#0f4c5c]">${prog.title}</h3>
-          <p class="text-sm text-slate-500 mt-1">${prog.description}</p>
-        </div>
-        <button onclick="playProgression(${idx})" class="flex items-center justify-center gap-2 bg-[#0f4c5c] hover:bg-[#156174] text-white px-5 py-3 rounded-xl font-bold transition-all active:scale-95 self-start md:self-center">
-          <i class="fa-solid fa-play"></i> Écouter la suite
-        </button>
+      <div class="card-header">
+        <span class="card-title">${prog.name}</span>
+        <span class="card-badge">${prog.difficulty}</span>
       </div>
-      <div class="grid grid-cols-4 gap-2 max-w-md">
-        ${diagramsHTML}
+      <div class="prog-chords-container">
+        ${chordsHtml}
       </div>
     `;
-    container.appendChild(card);
+    list.appendChild(card);
   });
 }
 
-// Play Full Chord Progression
-function playProgression(progIdx) {
-  const prog = PROGRESSIONS[progIdx];
-  const beatDuration = 1.5; // seconds per chord
-  
-  prog.chords.forEach((chordKey, index) => {
-    const chord = CHORDS[chordKey] || (prog.customChords && prog.customChords[chordKey]);
-    if (chord) {
-      playChord(chord.midi, index * beatDuration);
-    }
-  });
-}
+function renderStrums() {
+  const list = document.getElementById('strumList');
+  list.innerHTML = '';
+  STRUMS.forEach(strum => {
+    const card = document.createElement('div');
+    card.className = 'strum-card';
 
-// Register Service Worker for PWA Offline Support
-function registerServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('Service Worker enregistré avec succès !', reg.scope))
-        .catch(err => console.warn('Échec de l\'enregistrement du Service Worker:', err));
+    let patternHtml = '';
+    strum.pattern.forEach((step, idx) => {
+      const isDown = step === 'B';
+      const isUp = step === 'H';
+      const isMute = step === '_';
+      
+      patternHtml += `
+        <div class="strum-arrow ${isDown ? 'down' : isUp ? 'up' : 'mute'}">
+          <span>${isMute ? '•' : step}</span>
+          <span class="strum-arrow-sub">${idx + 1}</span>
+        </div>
+      `;
     });
+
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="card-title">${strum.name}</span>
+      </div>
+      <p style="color: var(--text-light); font-size: 0.9rem;">${strum.description}</p>
+      <div class="strum-pattern-display">
+        ${patternHtml}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+// --- PRACTICE ENGINE (METRONOME & PLAY-ALONG) ---
+let practiceInterval = null;
+let isPlaying = false;
+let currentStep = 0;
+let currentChordIdx = 0;
+
+function populatePracticeSelectors() {
+  const progSelect = document.getElementById('practiceProgression');
+  PROGRESSIONS.forEach(prog => {
+    const opt = document.createElement('option');
+    opt.value = prog.id;
+    opt.textContent = prog.name;
+    progSelect.appendChild(opt);
+  });
+
+  const strumSelect = document.getElementById('practiceStrum');
+  STRUMS.forEach(strum => {
+    const opt = document.createElement('option');
+    opt.value = strum.id;
+    opt.textContent = strum.name;
+    strumSelect.appendChild(opt);
+  });
+}
+
+function updatePracticeDisplay() {
+  const progId = document.getElementById('practiceProgression').value;
+  const strumId = document.getElementById('practiceStrum').value;
+  
+  const prog = PROGRESSIONS.find(p => p.id === progId);
+  const strum = STRUMS.find(s => s.id === strumId);
+
+  if (!prog || !strum) return;
+
+  // Update Chords
+  const currentChord = prog.chords[currentChordIdx];
+  const nextChord = prog.chords[(currentChordIdx + 1) % prog.chords.length];
+
+  document.getElementById('currentChordName').textContent = currentChord;
+  document.getElementById('currentChordDiagram').innerHTML = createChordSVG(currentChord, 60);
+
+  document.getElementById('nextChordName').textContent = nextChord;
+  document.getElementById('nextChordDiagram').innerHTML = createChordSVG(nextChord, 60);
+
+  // Update Strum Visualizer
+  const visualizer = document.getElementById('strumVisualizer');
+  visualizer.innerHTML = '';
+  strum.pattern.forEach((step, idx) => {
+    const isDown = step === 'B';
+    const isUp = step === 'H';
+    const isMute = step === '_';
+    
+    const arrow = document.createElement('div');
+    arrow.className = `strum-arrow ${isDown ? 'down' : isUp ? 'up' : 'mute'} ${idx === currentStep ? 'active' : ''}`;
+    arrow.innerHTML = `
+      <span>${isMute ? '•' : step}</span>
+      <span class="strum-arrow-sub">${idx + 1}</span>
+    `;
+    visualizer.appendChild(arrow);
+  });
+}
+
+function startPractice() {
+  initAudio();
+  if (isPlaying) return;
+
+  isPlaying = true;
+  document.getElementById('playBtn').disabled = true;
+  document.getElementById('stopBtn').disabled = false;
+
+  const bpm = parseInt(document.getElementById('practiceBpm').value);
+  // Calculate interval based on 8th notes (since patterns have 8 steps per bar)
+  // 4 beats per bar -> 8 steps per bar. Interval = (60 / BPM) / 2 seconds
+  const intervalMs = ((60 / bpm) / 2) * 1000;
+
+  currentStep = 0;
+  currentChordIdx = 0;
+
+  updatePracticeDisplay();
+  tick();
+
+  practiceInterval = setInterval(tick, intervalMs);
+}
+
+function tick() {
+  const progId = document.getElementById('practiceProgression').value;
+  const strumId = document.getElementById('practiceStrum').value;
+  
+  const prog = PROGRESSIONS.find(p => p.id === progId);
+  const strum = STRUMS.find(s => s.id === strumId);
+
+  if (!prog || !strum) return;
+
+  const currentChord = prog.chords[currentChordIdx];
+  const action = strum.pattern[currentStep];
+
+  // Play sound on active strums
+  if (action === 'B' || action === 'H') {
+    playChord(currentChord, 0.4, action === 'H' ? 0.015 : 0.03);
+  }
+
+  // Update Metronome Dots (4 beats)
+  const dots = document.querySelectorAll('.beat-dot');
+  dots.forEach(dot => dot.classList.remove('active'));
+  const beatIdx = Math.floor(currentStep / 2) % 4;
+  if (dots[beatIdx]) {
+    dots[beatIdx].classList.add('active');
+  }
+
+  // Highlight current strum step
+  updatePracticeDisplay();
+
+  // Advance step
+  currentStep = (currentStep + 1) % strum.pattern.length;
+  
+  // If pattern loops, change chord
+  if (currentStep === 0) {
+    currentChordIdx = (currentChordIdx + 1) % prog.chords.length;
   }
 }
+
+function stopPractice() {
+  isPlaying = false;
+  clearInterval(practiceInterval);
+  document.getElementById('playBtn').disabled = false;
+  document.getElementById('stopBtn').disabled = true;
+  
+  // Reset dots
+  document.querySelectorAll('.beat-dot').forEach(dot => dot.classList.remove('active'));
+  currentStep = 0;
+  currentChordIdx = 0;
+  updatePracticeDisplay();
+}
+
+// --- EVENT LISTENERS & TABS ---
+function setupTabs() {
+  const tabs = document.querySelectorAll('.tab-btn');
+  const contents = document.querySelectorAll('.tab-content');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+
+      tab.classList.add('active');
+      const target = tab.getAttribute('data-tab');
+      document.getElementById(target).classList.add('active');
+      
+      // Stop practice if leaving the practice tab
+      if (target !== 'practice' && isPlaying) {
+        stopPractice();
+      }
+    });
+  });
+}
+
+function setupEventListeners() {
+  document.getElementById('practiceBpm').addEventListener('input', (e) => {
+    document.getElementById('bpmVal').textContent = e.target.value;
+    if (isPlaying) {
+      // Restart with new tempo
+      stopPractice();
+      startPractice();
+    }
+  });
+
+  document.getElementById('practiceProgression').addEventListener('change', () => {
+    currentChordIdx = 0;
+    currentStep = 0;
+    updatePracticeDisplay();
+  });
+  
+  document.getElementById('practiceStrum').addEventListener('change', () => {
+    currentStep = 0;
+    updatePracticeDisplay();
+  });
+
+  document.getElementById('playBtn').addEventListener('click', startPractice);
+  document.getElementById('stopBtn').addEventListener('click', stopPractice);
+}
+
+// --- INITIALIZATION ---
+window.addEventListener('DOMContentLoaded', () => {
+  renderChords();
+  renderProgressions();
+  renderStrums();
+  populatePracticeSelectors();
+  setupTabs();
+  setupEventListeners();
+  updatePracticeDisplay();
+
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed', err));
+  }
+});

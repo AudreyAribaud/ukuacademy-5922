@@ -3,180 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UkuAcademy - Apprenez et Accordez votre Ukulélé</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f4c5c">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>UkuAcademy - Apprenez le Ukulélé</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#e67e22">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪕</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-[#fcfaf1] text-slate-800 font-sans min-h-screen flex flex-col pb-20">
-
-  <!-- Header -->
-  <header class="bg-[#0f4c5c] text-white py-4 px-6 shadow-md sticky top-0 z-50">
-    <div class="max-w-4xl mx-auto flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <div class="bg-[#fb8b24] p-2 rounded-full text-white shadow-inner">
-          <i class="fa-solid fa-guitar text-xl rotate-45"></i>
-        </div>
-        <div>
-          <h1 class="font-bold text-xl tracking-wide">UkuAcademy</h1>
-          <p class="text-xs text-teal-200">Votre compagnon de ukulélé</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <span id="connection-status" class="text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> En ligne
-        </span>
-      </div>
+<body>
+  <header>
+    <div class="logo-container">
+      <span class="logo-icon">🪕</span>
+      <h1>UkuAcademy</h1>
     </div>
+    <p class="subtitle">Maîtrisez les accords, enchaînements et rythmiques !</p>
   </header>
 
-  <!-- Main Content Container -->
-  <main class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6">
-    
-    <!-- VIEW 1: ACCORDEUR (TUNER) -->
-    <section id="view-tuner" class="view-section space-y-6">
-      <div class="bg-white rounded-3xl p-6 shadow-sm border border-orange-100/50 text-center">
-        <h2 class="text-2xl font-bold text-[#0f4c5c] mb-2">Accordeur Chromatique & Micro</h2>
-        <p class="text-sm text-slate-500 mb-6">Accordez votre ukulélé à l'oreille ou laissez le micro analyser la fréquence en temps réel.</p>
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="chords">Accords</button>
+    <button class="tab-btn" data-tab="progressions">Enchaînements</button>
+    <button class="tab-btn" data-tab="strums">Rythmiques</button>
+    <button class="tab-btn" data-tab="practice">Entraînement</button>
+  </nav>
 
-        <!-- Tuner Visualizer -->
-        <div class="relative w-64 h-64 mx-auto mb-6 flex flex-col items-center justify-center bg-slate-50 rounded-full border-4 border-slate-100 shadow-inner overflow-hidden">
-          <!-- Needle Gauge -->
-          <div id="tuner-gauge" class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div id="tuner-needle" class="w-1 h-28 bg-[#e36414] origin-bottom rounded-full transition-transform duration-100 ease-out" style="transform: translateY(-50%) rotate(0deg);"></div>
-          </div>
-          
-          <!-- Center Target Indicator -->
-          <div class="absolute w-4 h-4 bg-[#0f4c5c] rounded-full z-10 border-2 border-white"></div>
+  <main>
+    <!-- TAB: CHORDS -->
+    <section id="chords" class="tab-content active">
+      <h2>Dictionnaire d'Accords</h2>
+      <p class="section-desc">Cliquez sur un accord pour l'écouter et voir le diagramme de doigté.</p>
+      <div class="chord-grid" id="chordGrid"></div>
+    </section>
 
-          <!-- Live Feedback Text -->
-          <div class="z-20 mt-24 text-center">
-            <div id="detected-note" class="text-5xl font-black text-[#0f4c5c] tracking-tight">--</div>
-            <div id="detected-freq" class="text-xs text-slate-400 font-mono mt-1">0.0 Hz</div>
-            <div id="tuning-hint" class="text-sm font-semibold text-slate-500 mt-2">Activez le micro</div>
-          </div>
+    <!-- TAB: PROGRESSIONS -->
+    <section id="progressions" class="tab-content">
+      <h2>Suites d'Accords (Enchaînements)</h2>
+      <p class="section-desc">Pratiquez des suites d'accords célèbres et courantes pour jouer des centaines de chansons.</p>
+      <div class="progression-list" id="progressionList"></div>
+    </section>
 
-          <!-- Perfect Tune Glow -->
-          <div id="tune-glow" class="absolute inset-0 bg-emerald-500/10 opacity-0 transition-opacity duration-200 pointer-events-none"></div>
+    <!-- TAB: STRUMS -->
+    <section id="strums" class="tab-content">
+      <h2>Rythmiques (Strumming Patterns)</h2>
+      <p class="section-desc">Apprenez à gratter vos cordes en rythme. Suivez les flèches : <b>H</b> (Haut / Up) et <b>B</b> (Bas / Down).</p>
+      <div class="strum-list" id="strumList"></div>
+    </section>
+
+    <!-- TAB: PRACTICE -->
+    <section id="practice" class="tab-content">
+      <h2>Studio d'Entraînement Interactif</h2>
+      <p class="section-desc">Configurez votre session, lancez le métronome et jouez en rythme !</p>
+      
+      <div class="practice-setup">
+        <div class="setup-group">
+          <label for="practiceProgression">Enchaînement :</label>
+          <select id="practiceProgression"></select>
+        </div>
+        <div class="setup-group">
+          <label for="practiceStrum">Rythmique :</label>
+          <select id="practiceStrum"></select>
+        </div>
+        <div class="setup-group">
+          <label for="practiceBpm">Tempo (BPM) : <span id="bpmVal">100</span></label>
+          <input type="range" id="practiceBpm" min="50" max="180" value="100">
+        </div>
+      </div>
+
+      <div class="player-card">
+        <div class="metronome-indicator" id="metroIndicator">
+          <div class="beat-dot"></div>
+          <div class="beat-dot"></div>
+          <div class="beat-dot"></div>
+          <div class="beat-dot"></div>
         </div>
 
-        <!-- Micro Toggle Button -->
-        <div class="flex justify-center mb-8">
-          <button id="btn-mic-toggle" class="flex items-center gap-3 bg-[#e36414] hover:bg-[#fb8b24] text-white px-6 py-3.5 rounded-full font-bold shadow-lg shadow-orange-500/20 transition-all transform active:scale-95">
-            <i class="fa-solid fa-microphone text-lg animate-pulse"></i>
-            <span>Activer l'accordage micro</span>
-          </button>
+        <div class="practice-display">
+          <div class="chord-display-box current">
+            <span class="label">Accord Actuel</span>
+            <span class="chord-name" id="currentChordName">-</span>
+            <div class="chord-diagram-mini" id="currentChordDiagram"></div>
+          </div>
+          <div class="chord-display-box next">
+            <span class="label">Suivant</span>
+            <span class="chord-name" id="nextChordName">-</span>
+            <div class="chord-diagram-mini" id="nextChordDiagram"></div>
+          </div>
         </div>
 
-        <!-- Manual Reference Notes -->
-        <div>
-          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Notes de référence (Cliquez pour jouer)</p>
-          <div class="grid grid-cols-4 gap-3 max-w-sm mx-auto">
-            <button onclick="playReferenceNote('G', 392.00)" class="ref-note-btn bg-teal-50 hover:bg-teal-100 border border-teal-100 text-[#0f4c5c] font-bold py-4 rounded-2xl transition-all active:scale-95 flex flex-col items-center">
-              <span class="text-xl">G</span>
-              <span class="text-xs text-teal-600/70 font-normal mt-1">Sol (4)</span>
-            </button>
-            <button onclick="playReferenceNote('C', 261.63)" class="ref-note-btn bg-teal-50 hover:bg-teal-100 border border-teal-100 text-[#0f4c5c] font-bold py-4 rounded-2xl transition-all active:scale-95 flex flex-col items-center">
-              <span class="text-xl">C</span>
-              <span class="text-xs text-teal-600/70 font-normal mt-1">Do (4)</span>
-            </button>
-            <button onclick="playReferenceNote('E', 329.63)" class="ref-note-btn bg-teal-50 hover:bg-teal-100 border border-teal-100 text-[#0f4c5c] font-bold py-4 rounded-2xl transition-all active:scale-95 flex flex-col items-center">
-              <span class="text-xl">E</span>
-              <span class="text-xs text-teal-600/70 font-normal mt-1">Mi (4)</span>
-            </button>
-            <button onclick="playReferenceNote('A', 440.00)" class="ref-note-btn bg-teal-50 hover:bg-teal-100 border border-teal-100 text-[#0f4c5c] font-bold py-4 rounded-2xl transition-all active:scale-95 flex flex-col items-center">
-              <span class="text-xl">A</span>
-              <span class="text-xs text-teal-600/70 font-normal mt-1">La (4)</span>
-            </button>
-          </div>
+        <div class="strum-visualizer" id="strumVisualizer">
+          <!-- Dynamic strum arrows highlighted in real-time -->
+        </div>
+
+        <div class="player-controls">
+          <button id="playBtn" class="btn btn-primary">Démarrer la Session</button>
+          <button id="stopBtn" class="btn btn-secondary" disabled>Arrêter</button>
         </div>
       </div>
     </section>
-
-    <!-- VIEW 2: ENCHAÎNEMENTS D'ACCORDS (PROGRESSIONS) -->
-    <section id="view-progressions" class="view-section space-y-6 hidden">
-      <div class="bg-white rounded-3xl p-6 shadow-sm border border-orange-100/50">
-        <h2 class="text-2xl font-bold text-[#0f4c5c] mb-2">Enchaînements d'Accords</h2>
-        <p class="text-sm text-slate-500 mb-6">Découvrez et pratiquez des suites d'accords harmonieuses qui sonnent magnifiquement bien au ukulélé.</p>
-
-        <!-- Progressions List -->
-        <div class="space-y-6" id="progressions-container">
-          <!-- Dynamic content injected by JS -->
-        </div>
-      </div>
-    </section>
-
-    <!-- VIEW 3: DICTIONNAIRE D'ACCORDS (CHORDS) -->
-    <section id="view-chords" class="view-section space-y-6 hidden">
-      <div class="bg-white rounded-3xl p-6 shadow-sm border border-orange-100/50">
-        <h2 class="text-2xl font-bold text-[#0f4c5c] mb-2">Dictionnaire d'Accords</h2>
-        <p class="text-sm text-slate-500 mb-6">Cliquez sur un accord pour voir sa position sur le manche et écouter sa sonorité.</p>
-
-        <!-- Chord Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" id="chord-dictionary-grid">
-          <!-- Dynamic content injected by JS -->
-        </div>
-      </div>
-    </section>
-
-    <!-- VIEW 4: ACADEMY / CONSEILS -->
-    <section id="view-academy" class="view-section space-y-6 hidden">
-      <div class="bg-white rounded-3xl p-6 shadow-sm border border-orange-100/50">
-        <h2 class="text-2xl font-bold text-[#0f4c5c] mb-4">Astuces de Pro</h2>
-        
-        <div class="space-y-4">
-          <div class="p-4 bg-orange-50/50 rounded-2xl border border-orange-100/50 flex gap-4">
-            <div class="text-2xl text-[#e36414]"><i class="fa-solid fa-lightbulb"></i></div>
-            <div>
-              <h3 class="font-bold text-[#0f4c5c] mb-1">Comment bien accorder ?</h3>
-              <p class="text-sm text-slate-600 leading-relaxed">Toujours accorder en montant vers la note. Si votre corde est trop aiguë (trop haute), détendez-la en dessous de la note cible, puis remontez doucement en tendant la corde.</p>
-            </div>
-          </div>
-
-          <div class="p-4 bg-teal-50/50 rounded-2xl border border-teal-100/50 flex gap-4">
-            <div class="text-2xl text-[#0f4c5c]"><i class="fa-solid fa-music"></i></div>
-            <div>
-              <h3 class="font-bold text-[#0f4c5c] mb-1">La posture idéale</h3>
-              <p class="text-sm text-slate-600 leading-relaxed">Maintenez le ukulélé contre votre poitrine avec l'avant-bras droit. Votre main gauche doit rester souple pour glisser facilement le long du manche.</p>
-            </div>
-          </div>
-
-          <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/50 flex gap-4">
-            <div class="text-2xl text-amber-600"><i class="fa-solid fa-hand-point-up"></i></div>
-            <div>
-              <h3 class="font-bold text-[#0f4c5c] mb-1">Le rythme de base (Strumming)</h3>
-              <p class="text-sm text-slate-600 leading-relaxed">Le rythme le plus célèbre est le <strong>Bas, Bas, Haut, Haut, Bas, Haut</strong> (D-D-U-U-D-U). Pratiquez-le lentement sur l'accord de Do majeur (C) !</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
   </main>
 
-  <!-- Bottom Navigation Bar -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 shadow-lg z-50 py-2 px-4">
-    <div class="max-w-md mx-auto flex justify-around items-center">
-      <button onclick="switchView('tuner')" id="nav-tuner" class="nav-btn flex flex-col items-center gap-1 text-[#0f4c5c] font-semibold transition-all">
-        <i class="fa-solid fa-circle-dot text-xl"></i>
-        <span class="text-xs">Accordeur</span>
-      </button>
-      <button onclick="switchView('progressions')" id="nav-progressions" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-[#0f4c5c] transition-all">
-        <i class="fa-solid fa-sliders text-xl"></i>
-        <span class="text-xs">Enchaînements</span>
-      </button>
-      <button onclick="switchView('chords')" id="nav-chords" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-[#0f4c5c] transition-all">
-        <i class="fa-solid fa-book-open text-xl"></i>
-        <span class="text-xs">Accords</span>
-      </button>
-      <button onclick="switchView('academy')" id="nav-academy" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-[#0f4c5c] transition-all">
-        <i class="fa-solid fa-graduation-cap text-xl"></i>
-        <span class="text-xs">Conseils</span>
-      </button>
-    </div>
-  </nav>
+  <footer>
+    <p>&copy; 2024 UkuAcademy. Conçu pour les amoureux du Ukulélé. 🌴</p>
+  </footer>
 
   <script src="app.js"></script>
 </body>
